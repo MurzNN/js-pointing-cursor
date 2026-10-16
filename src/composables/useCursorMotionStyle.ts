@@ -25,13 +25,12 @@ function clamp(n: number, min: number, max: number): number {
 
 /**
  * Maps travel heading to a dangling tilt.
- * SVG cursors point roughly toward top-left; we treat heading 0 as east (CSS/math)
- * and offset so “forward” travel swings the body behind the tip.
+ * Tip is held (transform-origin); body trails behind travel so the tip leads.
+ * CSS positive rotation is clockwise — moving left (heading π) needs CCW (negative)
+ * so the bottom swings to the right of the tip.
  */
-function headingToTilt(headingRad: number, maxTilt: number): number {
-  // Convert math angle (0 = east, CCW) to a cursor-friendly tilt around rest.
-  // Tip is "held"; body lags opposite to velocity → tilt ≈ heading - 90° (downward hang).
-  const deg = radToDeg(headingRad) - 90
+export function headingToTilt(headingRad: number, maxTilt: number): number {
+  const deg = 90 - radToDeg(headingRad)
   return clamp(deg, -maxTilt, maxTilt)
 }
 
