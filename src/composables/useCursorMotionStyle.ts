@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue'
+import type { Ref } from 'vue'
 import type { MotionFrame, MotionStyle, Point } from '../types'
 
 export interface UseCursorMotionStyleOptions {
@@ -14,6 +14,8 @@ export interface UseCursorMotionStyleOptions {
   restDeg?: number
   /** Speed (px/frame-ish) below which follow motion settles upright. */
   settleSpeed?: number
+  /** Called whenever rotation changes (for imperative paint). */
+  onRotation?: (deg: number) => void
 }
 
 function radToDeg(rad: number): number {
@@ -48,11 +50,10 @@ export function headingToRotation(
   headingRad: number,
   defaultAngle = 0,
 ): number {
-  // Tip at rest points at (-90° + defaultAngle). Aim that at travel heading.
   return normalizeDeg(radToDeg(headingRad) + 90 - defaultAngle)
 }
 
-/** @deprecated Use headingToRotation — kept for call-site clarity in older tests. */
+/** @deprecated Use headingToRotation */
 export function headingToTilt(
   headingRad: number,
   _maxTilt: number,
@@ -63,7 +64,8 @@ export function headingToTilt(
 
 /**
  * `standard` keeps rotation at restDeg (0).
- * `dangling` rotates so the tip points along travel (full range, including up/down).
+ * `dangling` rotates so the tip points along travel.
+ * Rotation is a plain number (not a Vue ref) for the rAF hot path.
  */
 export function useCursorMotionStyle(
   style: Ref<MotionStyle> | (() => MotionStyle),
@@ -73,7 +75,7 @@ export function useCursorMotionStyle(
   const restDeg = options.restDeg ?? 0
   const settleSpeed = options.settleSpeed ?? 1.2
 
-  const rotationDeg = ref(restDeg)
+  let rotationDeg = restDeg
   let settling = false
   let travelHeadingRad: number | null = null
   let settleRaf = 0
@@ -84,6 +86,11 @@ export function useCursorMotionStyle(
 
   function getDefaultAngle(): number {
     return resolveNumber(options.defaultAngle, 0)
+  }
+
+  function setRotation(deg: number): void {
+    rotationDeg = deg
+    options.onRotation?.(deg)
   }
 
   function cancelSettleLoop() {
@@ -99,7 +106,7 @@ export function useCursorMotionStyle(
 
   function startSettleLoop(): void {
     if (getStyle() !== 'dangling') {
-      rotationDeg.value = restDeg
+      setRotation(restDeg)
       travelHeadingRad = null
       settling = false
       return
@@ -113,13 +120,10 @@ export function useCursorMotionStyle(
         settleRaf = 0
         return
       }
-      rotationDeg.value = lerpAngle(
-        rotationDeg.value,
-        restDeg,
-        Math.min(1, spring * 1.6),
-      )
-      if (Math.abs(angleError(rotationDeg.value, restDeg)) < 0.4) {
-        rotationDeg.value = restDeg
+      const next = lerpAngle(rotationDeg, restDeg, Math.min(1, spring * 1.6))
+      setRotation(next)
+      if (Math.abs(angleError(rotationDeg, restDeg)) < 0.4) {
+        setRotation(restDeg)
         settling = false
         settleRaf = 0
         return
@@ -141,15 +145,24 @@ export function useCursorMotionStyle(
     }
   }
 
+  /** True when scripted travel heading is locked (caller can skip Bézier heading). */
+  function hasLockedTravel(): boolean {
+    return travelHeadingRad != null
+  }
+
+  function isSettled(): boolean {
+    return !settling && Math.abs(angleError(rotationDeg, restDeg)) < 0.4
+  }
+
   function chaseHeading(headingRad: number): void {
     const target = headingToRotation(headingRad, getDefaultAngle())
-    rotationDeg.value = lerpAngle(rotationDeg.value, target, spring)
+    setRotation(lerpAngle(rotationDeg, target, spring))
   }
 
   function onFrame(frame: MotionFrame): void {
     if (getStyle() !== 'dangling') {
       cancelSettleLoop()
-      rotationDeg.value = restDeg
+      if (rotationDeg !== restDeg) setRotation(restDeg)
       settling = false
       travelHeadingRad = null
       return
@@ -174,7 +187,7 @@ export function useCursorMotionStyle(
       return
     }
 
-    if (!settling && Math.abs(angleError(rotationDeg.value, restDeg)) > 0.4) {
+    if (!settling && Math.abs(angleError(rotationDeg, restDeg)) > 0.4) {
       startSettleLoop()
     }
   }
@@ -185,13 +198,19 @@ export function useCursorMotionStyle(
 
   function reset(): void {
     cancelSettleLoop()
-    rotationDeg.value = restDeg
+    setRotation(restDeg)
     settling = false
     travelHeadingRad = null
   }
 
+  function getRotation(): number {
+    return rotationDeg
+  }
+
   return {
-    rotationDeg: computed(() => rotationDeg.value),
+    getRotation,
+    hasLockedTravel,
+    isSettled,
     beginTravel,
     onFrame,
     onSettle,

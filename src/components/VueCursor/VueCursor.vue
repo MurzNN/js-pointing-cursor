@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -26,12 +27,15 @@ import ClickBurst from './ClickBurst.vue'
 import type {
   ClickBurstInstance,
   ClickOptions,
+  MotionFrame,
   MotionStyle,
   MouseButton,
   MoveToOptions,
   Point,
   ShapeName,
 } from '../../types'
+
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
@@ -69,6 +73,11 @@ const props = withDefaults(
     clickBurstRightColor?: string
     /** Fallback stroke color when a button-specific color is not used. */
     clickBurstColor?: string
+    /**
+     * When true, emit `move` while animating/following (throttled ~30ms).
+     * Default false — only emit at move start/end to avoid parent re-renders.
+     */
+    emitMoveFrames?: boolean
   }>(),
   {
     size: '3em',
@@ -95,6 +104,7 @@ const props = withDefaults(
     clickBurstLeftColor: '#22c55e',
     clickBurstRightColor: '#ef4444',
     clickBurstColor: '#111111',
+    emitMoveFrames: false,
   },
 )
 
@@ -104,21 +114,35 @@ const emit = defineEmits<{
   hide: []
 }>()
 
-const pos = ref<Point>({ x: 0, y: 0 })
+const rootEl = ref<HTMLElement | null>(null)
+const innerEl = ref<HTMLElement | null>(null)
+
 const isVisible = ref(props.visible)
 const isFollowing = ref(props.followMouse)
-const headingRad = ref(0)
+
+/** Plain locals for the rAF hot path (not Vue refs). */
+let posX = 0
+let posY = 0
+let rotationDeg = 0
+let pressScale = 1
 
 const interaction = useCursorInteraction({
   animationDuration: props.clickAnimationDuration,
 })
+
 const localMotionStyle = ref<MotionStyle>(props.motionStyle)
 const effectiveDefaultAngle = computed(
   () => props.defaultAngle ?? SHAPE_DEFAULT_ANGLES[props.shape],
 )
+
 const motionStyleApi = useCursorMotionStyle(localMotionStyle, {
   defaultAngle: effectiveDefaultAngle,
+  onRotation(deg) {
+    rotationDeg = deg
+    paintInner()
+  },
 })
+
 watch(
   () => props.motionStyle,
   (value) => {
@@ -127,12 +151,26 @@ watch(
   },
 )
 
+watch(
+  () => interaction.pressScale.value,
+  (value) => {
+    pressScale = value
+    paintInner()
+  },
+)
+
 let motionHandle: AnimateHandle | null = null
 let followRaf = 0
 let followTarget: Point | null = null
+let lastMouseMoveAt = 0
 let nativeCursorBackup = ''
 let burstSeq = 0
 const bursts = ref<ClickBurstInstance[]>([])
+
+let lastMoveEmitAt = 0
+const MOVE_EMIT_INTERVAL_MS = 30
+const FOLLOW_IDLE_MS = 100
+const SUBPIXEL = 0.05
 
 function burstColorFor(button: MouseButton): string {
   if (button === 'right') return props.clickBurstRightColor
@@ -140,13 +178,13 @@ function burstColorFor(button: MouseButton): string {
   return props.clickBurstColor
 }
 
-function spawnBurst(button: MouseButton, at: Point = pos.value) {
+function spawnBurst(button: MouseButton, at?: Point) {
   if (!props.clickBurst) return
   const id = ++burstSeq
   bursts.value.push({
     id,
-    x: at.x,
-    y: at.y,
+    x: at?.x ?? posX,
+    y: at?.y ?? posY,
     color: burstColorFor(button),
   })
 }
@@ -165,6 +203,7 @@ const hotspot = computed(() => {
   }
 })
 
+/** Static layout styles — transforms are applied imperatively in paint(). */
 const outerStyle = computed((): CSSProperties => ({
   position: 'fixed',
   left: '0',
@@ -173,27 +212,49 @@ const outerStyle = computed((): CSSProperties => ({
   height: props.size,
   zIndex: props.zIndex,
   pointerEvents: 'none',
-  // Place hotspot on (x,y): translate to point, then pull back by hotspot fraction of box
-  transform: `translate3d(${pos.value.x}px, ${pos.value.y}px, 0) translate(-${hotspot.value.x * 100}%, -${hotspot.value.y * 100}%)`,
-  opacity: isVisible.value ? 1 : 0,
-  visibility: isVisible.value ? 'visible' : 'hidden',
-  transition: 'opacity 120ms ease',
-  willChange: 'transform',
 }))
 
-const innerStyle = computed((): CSSProperties => ({
-  width: '100%',
-  height: '100%',
-  transformOrigin: `${hotspot.value.x * 100}% ${hotspot.value.y * 100}%`,
-  transform: `rotate(${motionStyleApi.rotationDeg.value}deg) scale(${interaction.pressScale.value})`,
-  display: 'block',
-}))
+function hotspotFractions(): { x: number; y: number } {
+  return hotspot.value
+}
 
-function applyFrame(frame: { x: number; y: number; headingRad: number; vx: number; vy: number; progress: number }) {
-  pos.value = { x: frame.x, y: frame.y }
-  headingRad.value = frame.headingRad
+function paintOuter(): void {
+  const el = rootEl.value
+  if (!el) return
+  const h = hotspotFractions()
+  el.style.transform = `translate3d(${posX}px, ${posY}px, 0) translate(-${h.x * 100}%, -${h.y * 100}%)`
+}
+
+function paintInner(): void {
+  const el = innerEl.value
+  if (!el) return
+  const h = hotspotFractions()
+  el.style.transformOrigin = `${h.x * 100}% ${h.y * 100}%`
+  el.style.transform = `rotate(${rotationDeg}deg) scale(${pressScale})`
+}
+
+function paint(): void {
+  paintOuter()
+  paintInner()
+}
+
+function emitMove(kind: 'frame' | 'boundary'): void {
+  if (kind === 'frame') {
+    if (!props.emitMoveFrames) return
+    const now = performance.now()
+    if (now - lastMoveEmitAt < MOVE_EMIT_INTERVAL_MS) return
+    lastMoveEmitAt = now
+  }
+  emit('move', { x: posX, y: posY })
+}
+
+function applyFrame(frame: MotionFrame, opts?: { emitBoundary?: boolean }): void {
+  posX = frame.x
+  posY = frame.y
   motionStyleApi.onFrame(frame)
-  emit('move', { x: frame.x, y: frame.y })
+  paint()
+  if (opts?.emitBoundary) emitMove('boundary')
+  else emitMove('frame')
 }
 
 function cancelMotion() {
@@ -231,28 +292,34 @@ async function moveTo(
 
   const animate = options.animate !== false
   if (!animate) {
-    jumpTo(point, applyFrame)
+    jumpTo(point, (f) => applyFrame(f, { emitBoundary: true }))
     motionStyleApi.onSettle()
     return
   }
 
-  const from = { ...pos.value }
+  const from = { x: posX, y: posY }
   const dist = Math.hypot(point.x - from.x, point.y - from.y)
   const duration =
     options.duration ??
     durationForDistance(dist, props.minDuration, props.maxDuration)
   const path = createCurvedPath(from, point)
 
-  // Lock dangling tilt to overall travel intent (not Bézier tangents mid-curve).
   motionStyleApi.beginTravel(from, point)
+  emitMove('boundary')
+
+  // Skip Bézier heading when dangling travel is locked.
+  const needHeading =
+    localMotionStyle.value !== 'dangling' || !motionStyleApi.hasLockedTravel()
 
   motionHandle = animateAlong(path, {
     duration,
+    needHeading,
     onFrame: applyFrame,
   })
   await motionHandle.finished
   motionHandle = null
   motionStyleApi.onSettle()
+  emitMove('boundary')
 }
 
 function setFollow(enabled: boolean) {
@@ -260,7 +327,6 @@ function setFollow(enabled: boolean) {
   if (!enabled) {
     stopFollowLoop()
     restoreNativeCursor()
-    // Return to resting angle when follow stops.
     motionStyleApi.onSettle()
   } else {
     startFollowLoop()
@@ -269,20 +335,20 @@ function setFollow(enabled: boolean) {
 }
 
 function getPosition(): Point {
-  return { ...pos.value }
+  return { x: posX, y: posY }
 }
 
 async function click(options: ClickOptions = {}): Promise<void> {
   const button = options.button ?? 'left'
   const showBurst = options.burst ?? props.clickBurst
-  if (showBurst) spawnBurst(button, pos.value)
+  if (showBurst) spawnBurst(button)
 
   await interaction.click({
     ...options,
     button,
     delayMs: options.delayMs ?? props.clickAnimationDuration,
-    clientX: pos.value.x,
-    clientY: pos.value.y,
+    clientX: posX,
+    clientY: posY,
   })
 }
 
@@ -305,7 +371,7 @@ async function clickAt(
   if (options.move !== false) {
     await moveTo(point.x, point.y, { animate: options.animate !== false })
   } else {
-    jumpTo(point, applyFrame)
+    jumpTo(point, (f) => applyFrame(f, { emitBoundary: true }))
   }
 
   await click(options)
@@ -335,49 +401,67 @@ function onNativeMouseUp() {
 function onMouseMove(event: MouseEvent) {
   if (!isFollowing.value) return
   followTarget = { x: event.clientX, y: event.clientY }
+  lastMouseMoveAt = performance.now()
+  if (!followRaf) {
+    followRaf = requestAnimationFrame(followTick)
+  }
 }
 
 function followTick() {
-  if (!isFollowing.value) return
-  if (followTarget) {
-    // Light smoothing toward pointer
-    const dx = followTarget.x - pos.value.x
-    const dy = followTarget.y - pos.value.y
-    pos.value = {
-      x: pos.value.x + dx * 0.45,
-      y: pos.value.y + dy * 0.45,
-    }
-    headingRad.value = Math.atan2(dy, dx)
-    // progress stays < 1 so dangling treats this as live follow velocity
-    motionStyleApi.onFrame({
-      x: pos.value.x,
-      y: pos.value.y,
-      vx: dx,
-      vy: dy,
-      headingRad: headingRad.value,
-      progress: 0,
-    })
-    emit('move', { ...pos.value })
-  } else {
-    // No recent pointer sample — ease upright
-    motionStyleApi.onFrame({
-      x: pos.value.x,
-      y: pos.value.y,
-      vx: 0,
-      vy: 0,
-      headingRad: 0,
-      progress: 0,
-    })
+  if (!isFollowing.value) {
+    followRaf = 0
+    return
   }
+
+  const now = performance.now()
+  const idle = now - lastMouseMoveAt > FOLLOW_IDLE_MS
+
+  if (followTarget) {
+    const dx = followTarget.x - posX
+    const dy = followTarget.y - posY
+    const moved = Math.abs(dx) > SUBPIXEL || Math.abs(dy) > SUBPIXEL
+
+    if (moved) {
+      posX += dx * 0.45
+      posY += dy * 0.45
+      motionStyleApi.onFrame({
+        x: posX,
+        y: posY,
+        vx: dx,
+        vy: dy,
+        headingRad: Math.atan2(dy, dx),
+        progress: 0,
+      })
+      paint()
+      emitMove('frame')
+    } else if (!idle) {
+      motionStyleApi.onFrame({
+        x: posX,
+        y: posY,
+        vx: 0,
+        vy: 0,
+        headingRad: 0,
+        progress: 0,
+      })
+    }
+  }
+
+  if (idle && motionStyleApi.isSettled()) {
+    followRaf = 0
+    return
+  }
+
   followRaf = requestAnimationFrame(followTick)
 }
 
 function startFollowLoop() {
-  if (followRaf) return
+  lastMouseMoveAt = performance.now()
   window.addEventListener('mousemove', onMouseMove, { passive: true })
   window.addEventListener('mousedown', onNativeMouseDown, true)
   window.addEventListener('mouseup', onNativeMouseUp, true)
-  followRaf = requestAnimationFrame(followTick)
+  if (!followRaf) {
+    followRaf = requestAnimationFrame(followTick)
+  }
 }
 
 function stopFollowLoop() {
@@ -439,15 +523,23 @@ watch(
   },
 )
 
+watch(
+  () => [props.size, props.shape, props.hotspotX, props.hotspotY] as const,
+  () => {
+    nextTick(() => paint())
+  },
+)
+
 onMounted(() => {
-  // Start near viewport center if no coords provided
   if (typeof props.x === 'number' && typeof props.y === 'number') {
-    jumpTo({ x: props.x, y: props.y }, applyFrame)
+    jumpTo({ x: props.x, y: props.y }, (f) => applyFrame(f, { emitBoundary: true }))
   } else if (typeof window !== 'undefined') {
     jumpTo(
       { x: window.innerWidth / 2, y: window.innerHeight / 2 },
-      applyFrame,
+      (f) => applyFrame(f, { emitBoundary: true }),
     )
+  } else {
+    paint()
   }
   if (props.followMouse) {
     setFollow(true)
@@ -482,13 +574,17 @@ defineExpose({
 <template>
   <!-- Multi-root (cursor + bursts): fallthrough attrs must be bound explicitly. -->
   <div
+    ref="rootEl"
     class="vue-cursor"
     v-bind="$attrs"
-    :class="[`vue-cursor--${shape}`, { 'vue-cursor--hidden': !isVisible }]"
+    :class="[
+      `vue-cursor--${shape}`,
+      { 'vue-cursor--hidden': !isVisible },
+    ]"
     :style="outerStyle"
     aria-hidden="true"
   >
-    <div class="vue-cursor__inner" :style="innerStyle">
+    <div ref="innerEl" class="vue-cursor__inner">
       <slot
         :pressed="interaction.state.value !== 'idle'"
         :button="interaction.button.value"
@@ -531,3 +627,33 @@ defineExpose({
     />
   </div>
 </template>
+
+<style scoped>
+.vue-cursor {
+  will-change: transform;
+  contain: layout style;
+}
+
+.vue-cursor__inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Opacity/visibility only — never transition transform on the paint root. */
+.vue-cursor--hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms ease;
+}
+
+.vue-cursor:not(.vue-cursor--hidden) {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms ease;
+}
+</style>

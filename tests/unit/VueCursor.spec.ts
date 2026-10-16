@@ -25,7 +25,7 @@ describe('VueCursor', () => {
     wrapper.unmount()
   })
 
-  it('exposes show/hide and toggles visibility', async () => {
+  it('exposes show/hide and toggles visibility class', async () => {
     const wrapper = mount(VueCursor, {
       props: { x: 10, y: 10, visible: true },
       attachTo: document.body,
@@ -36,10 +36,10 @@ describe('VueCursor', () => {
     }
     api.hide()
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.vue-cursor').attributes('style')).toContain('opacity: 0')
+    expect(wrapper.find('.vue-cursor').classes()).toContain('vue-cursor--hidden')
     api.show()
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.vue-cursor').attributes('style')).toContain('opacity: 1')
+    expect(wrapper.find('.vue-cursor').classes()).not.toContain('vue-cursor--hidden')
     wrapper.unmount()
   })
 
@@ -58,6 +58,50 @@ describe('VueCursor', () => {
     }
     await api.moveTo(200, 150, { animate: false })
     expect(api.getPosition()).toEqual({ x: 200, y: 150 })
+    const root = wrapper.find('.vue-cursor').element as HTMLElement
+    expect(root.style.transform).toContain('200px')
+    expect(root.style.transform).toContain('150px')
+    wrapper.unmount()
+  })
+
+  it('emits move only at boundaries by default during moveTo', async () => {
+    const wrapper = mount(VueCursor, {
+      props: { x: 0, y: 0, motionStyle: 'standard' },
+      attachTo: document.body,
+    })
+    const api = wrapper.vm as unknown as {
+      moveTo: (
+        x: number,
+        y: number,
+        opts?: { animate?: boolean; duration?: number },
+      ) => Promise<void>
+    }
+
+    const before = (wrapper.emitted('move') ?? []).length
+
+    let now = 0
+    vi.stubGlobal('performance', { now: () => now })
+    const callbacks: FrameRequestCallback[] = []
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      callbacks.push(cb)
+      return callbacks.length
+    })
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    const pending = api.moveTo(100, 0, { duration: 100 })
+    now = 50
+    callbacks[0]?.(now)
+    now = 100
+    callbacks[1]?.(now)
+    await pending
+
+    const moves = (wrapper.emitted('move') ?? []).slice(before)
+    // start + end (no per-frame emits)
+    expect(moves.length).toBe(2)
+    expect(moves[0]).toEqual([{ x: 0, y: 0 }])
+    expect(moves[1]).toEqual([{ x: 100, y: 0 }])
+
+    vi.unstubAllGlobals()
     wrapper.unmount()
   })
 

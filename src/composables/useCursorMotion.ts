@@ -7,12 +7,20 @@ export interface CubicBezierPath {
   p3: Point
 }
 
+export interface SamplePathOptions {
+  /** When false, skip derivative + atan2 (dangling with locked travel heading). */
+  needHeading?: boolean
+  /** Reuse this object instead of allocating a new MotionFrame. */
+  out?: MotionFrame
+}
+
 export interface AnimateAlongOptions {
   duration: number
   /** Called every frame with sample data. */
   onFrame: (frame: MotionFrame) => void
   /** Easing function mapping linear t ∈ [0,1] → eased t. Default ease-in-out. */
   ease?: (t: number) => number
+  needHeading?: boolean
   /** Optional now() for tests. */
   now?: () => number
   /** Optional rAF / cancel for tests. */
@@ -58,6 +66,21 @@ export function bezierPoint(path: CubicBezierPath, t: number): Point {
   }
 }
 
+/** Write cubic Bézier position into `out` (no allocation). */
+export function bezierPointInto(
+  path: CubicBezierPath,
+  t: number,
+  out: Point,
+): void {
+  const u = 1 - t
+  const tt = t * t
+  const uu = u * u
+  const uuu = uu * u
+  const ttt = tt * t
+  out.x = uuu * path.p0.x + 3 * uu * t * path.p1.x + 3 * u * tt * path.p2.x + ttt * path.p3.x
+  out.y = uuu * path.p0.y + 3 * uu * t * path.p1.y + 3 * u * tt * path.p2.y + ttt * path.p3.y
+}
+
 /** First derivative of cubic Bézier (velocity direction). */
 export function bezierDerivative(path: CubicBezierPath, t: number): Point {
   const u = 1 - t
@@ -97,7 +120,7 @@ export function createCurvedPath(
   const t2 = 0.6 + random() * 0.2
 
   return {
-    p0: { ...from },
+    p0: { x: from.x, y: from.y },
     p1: {
       x: from.x + dx * t1 + nx * j1,
       y: from.y + dy * t1 + ny * j1,
@@ -106,7 +129,7 @@ export function createCurvedPath(
       x: from.x + dx * t2 + nx * j2,
       y: from.y + dy * t2 + ny * j2,
     },
-    p3: { ...to },
+    p3: { x: to.x, y: to.y },
   }
 }
 
@@ -120,20 +143,39 @@ export function durationForDistance(
   return clamp(dist / pxPerMs, minDuration, maxDuration)
 }
 
-export function samplePath(path: CubicBezierPath, t: number, progress: number): MotionFrame {
-  const point = bezierPoint(path, t)
-  const deriv = bezierDerivative(path, t)
-  const speed = Math.hypot(deriv.x, deriv.y) || 1
-  return {
-    x: point.x,
-    y: point.y,
-    vx: deriv.x,
-    vy: deriv.y,
-    headingRad: Math.atan2(deriv.y, deriv.x),
-    progress,
-    // normalize unused but available via vx/vy magnitude
-    ...(speed >= 0 ? {} : {}),
+const sharedFrame: MotionFrame = {
+  x: 0,
+  y: 0,
+  vx: 0,
+  vy: 0,
+  headingRad: 0,
+  progress: 0,
+}
+
+export function samplePath(
+  path: CubicBezierPath,
+  t: number,
+  progress: number,
+  options: SamplePathOptions = {},
+): MotionFrame {
+  const out = options.out ?? sharedFrame
+  const needHeading = options.needHeading !== false
+
+  bezierPointInto(path, t, out)
+  out.progress = progress
+
+  if (needHeading) {
+    const deriv = bezierDerivative(path, t)
+    out.vx = deriv.x
+    out.vy = deriv.y
+    out.headingRad = Math.atan2(deriv.y, deriv.x)
+  } else {
+    out.vx = 0
+    out.vy = 0
+    out.headingRad = 0
   }
+
+  return out
 }
 
 /**
@@ -144,6 +186,8 @@ export function animateAlong(path: CubicBezierPath, options: AnimateAlongOptions
   const now = options.now ?? (() => performance.now())
   const raf = options.raf ?? ((cb) => requestAnimationFrame(cb))
   const caf = options.caf ?? ((id) => cancelAnimationFrame(id))
+  const needHeading = options.needHeading !== false
+  const frame = sharedFrame
 
   let cancelled = false
   let frameId = 0
@@ -162,7 +206,7 @@ export function animateAlong(path: CubicBezierPath, options: AnimateAlongOptions
     const elapsed = time - start
     const linear = options.duration <= 0 ? 1 : clamp(elapsed / options.duration, 0, 1)
     const eased = ease(linear)
-    options.onFrame(samplePath(path, eased, linear))
+    options.onFrame(samplePath(path, eased, linear, { needHeading, out: frame }))
 
     if (linear < 1) {
       frameId = raf(tick)
@@ -172,7 +216,7 @@ export function animateAlong(path: CubicBezierPath, options: AnimateAlongOptions
   }
 
   // Seed first frame immediately at t=0
-  options.onFrame(samplePath(path, 0, 0))
+  options.onFrame(samplePath(path, 0, 0, { needHeading, out: frame }))
   frameId = raf(tick)
 
   return {
@@ -188,14 +232,13 @@ export function animateAlong(path: CubicBezierPath, options: AnimateAlongOptions
 
 /** Instant jump (no animation). */
 export function jumpTo(to: Point, onFrame: (frame: MotionFrame) => void): void {
-  onFrame({
-    x: to.x,
-    y: to.y,
-    vx: 0,
-    vy: 0,
-    headingRad: 0,
-    progress: 1,
-  })
+  sharedFrame.x = to.x
+  sharedFrame.y = to.y
+  sharedFrame.vx = 0
+  sharedFrame.vy = 0
+  sharedFrame.headingRad = 0
+  sharedFrame.progress = 1
+  onFrame(sharedFrame)
 }
 
 export function useCursorMotion() {

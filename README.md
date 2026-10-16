@@ -111,6 +111,14 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 | `clickBurstLeftColor` | `'#22c55e'` | Left-click burst color |
 | `clickBurstRightColor` | `'#ef4444'` | Right-click burst color |
 | `clickBurstColor` | `'#111111'` | Fallback burst stroke color |
+| `emitMoveFrames` | `false` | When `true`, also emit `move` while animating/following (throttled ~30ms). Default emits only at move start/end |
+
+### Events
+
+| Event | Payload | When |
+| --- | --- | --- |
+| `move` | `{ x, y }` | Move start/end by default; also mid-motion when `emitMoveFrames` |
+| `show` / `hide` | — | Visibility toggled |
 
 ### Methods (`ref`)
 
@@ -120,7 +128,7 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 | `moveTo(x, y, options?)` | Animate to viewport coordinates |
 | `moveTo(selector \| Element, options?)` | Animate to element center |
 | `setFollow(boolean)` | Enable / disable follow mode |
-| `getPosition()` | Current `{ x, y }` |
+| `getPosition()` | Current `{ x, y }` (reads live motion locals; accurate during animation) |
 | `click(options?)` / `clickAt(...)` | Press animation; `real: true` dispatches DOM events |
 | `leftClick` / `rightClick` | Convenience wrappers |
 | `setMotionStyle(style)` | Switch `standard` / `dangling` |

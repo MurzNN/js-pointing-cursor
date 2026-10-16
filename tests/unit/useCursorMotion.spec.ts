@@ -45,6 +45,25 @@ describe('samplePath', () => {
     expect(frame.headingRad).toBeTypeOf('number')
     expect(frame.progress).toBe(0.5)
   })
+
+  it('reuses an out frame and can skip heading', () => {
+    const path = createCurvedPath({ x: 0, y: 0 }, { x: 100, y: 0 }, () => 0.5)
+    const out = {
+      x: 0,
+      y: 0,
+      vx: 99,
+      vy: 99,
+      headingRad: 99,
+      progress: 0,
+    }
+    const frame = samplePath(path, 0.5, 0.5, { needHeading: false, out })
+    expect(frame).toBe(out)
+    expect(out.x).toBeTypeOf('number')
+    expect(out.vx).toBe(0)
+    expect(out.vy).toBe(0)
+    expect(out.headingRad).toBe(0)
+    expect(out.progress).toBe(0.5)
+  })
 })
 
 describe('durationForDistance', () => {
