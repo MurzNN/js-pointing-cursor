@@ -184,6 +184,9 @@ async function moveTo(
     durationForDistance(dist, props.minDuration, props.maxDuration)
   const path = createCurvedPath(from, point)
 
+  // Lock dangling tilt to overall travel intent (not Bézier tangents mid-curve).
+  motionStyleApi.beginTravel(from, point)
+
   motionHandle = animateAlong(path, {
     duration,
     onFrame: applyFrame,
@@ -199,6 +202,8 @@ function setFollow(enabled: boolean) {
     stopFollowLoop()
     restoreNativeCursor()
   } else {
+    // Dangling is for scripted moves; keep upright while following.
+    motionStyleApi.reset()
     startFollowLoop()
     applyNativeCursorHide()
   }
