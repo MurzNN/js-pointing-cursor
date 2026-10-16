@@ -1,0 +1,63 @@
+{
+  "$schema": "https://shadcn-vue.com/schema/registry.json",
+  "name": "vue-cursor",
+  "homepage": "https://murznn.github.io/vue-cursor/",
+  "items": [
+    {
+      "name": "vue-cursor",
+      "type": "registry:ui",
+      "title": "Vue Cursor",
+      "description": "An oversized Vue 3 cursor with curved motion, follow mode, replaceable SVG shapes, and click animation.",
+      "author": "Alexey Murz Korepov",
+      "dependencies": ["vue@^3.5.0"],
+      "categories": ["cursor", "animation"],
+      "docs": "Import from `@/components/ui/vue-cursor`. Full guide: https://murznn.github.io/vue-cursor/",
+      "files": [
+        {
+          "path": "src/components/VueCursor/VueCursor.vue",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/VueCursor/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/shapes/ArrowCursor.vue",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/shapes/PointerCursor.vue",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/shapes/HandCursor.vue",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/shapes/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/composables/useCursorMotion.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/composables/useCursorInteraction.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/composables/useCursorMotionStyle.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/utils/resolveTarget.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/types.ts",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}
