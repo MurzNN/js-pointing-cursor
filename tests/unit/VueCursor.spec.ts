@@ -89,4 +89,27 @@ describe('VueCursor', () => {
     expect(wrapper.find('.vue-cursor-shape--pointer').exists()).toBe(true)
     wrapper.unmount()
   })
+
+  it('exposes click and clickAt', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(VueCursor, {
+      props: { x: 10, y: 10, clickAnimationDuration: 50 },
+      attachTo: document.body,
+    })
+    const api = wrapper.vm as unknown as {
+      leftClick: (o?: { real?: boolean }) => Promise<void>
+      clickAt: (x: number, y: number, o?: { animate?: boolean; real?: boolean }) => Promise<void>
+      getPosition: () => { x: number; y: number }
+    }
+    const pending = api.leftClick({ real: false })
+    await vi.advanceTimersByTimeAsync(50)
+    await pending
+
+    const pendingMove = api.clickAt(80, 90, { animate: false, real: false })
+    await vi.advanceTimersByTimeAsync(50)
+    await pendingMove
+    expect(api.getPosition()).toEqual({ x: 80, y: 90 })
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
 })

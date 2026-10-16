@@ -19,6 +19,7 @@ import { useCursorInteraction } from '../../composables/useCursorInteraction'
 import { useCursorMotionStyle } from '../../composables/useCursorMotionStyle'
 import { resolveMoveTarget } from '../../utils/resolveTarget'
 import type {
+  ClickOptions,
   MotionStyle,
   MoveToOptions,
   Point,
@@ -43,6 +44,8 @@ const props = withDefaults(
     minDuration?: number
     maxDuration?: number
     motionStyle?: MotionStyle
+    mirrorNativeClicks?: boolean
+    clickAnimationDuration?: number
   }>(),
   {
     size: '2em',
@@ -59,6 +62,8 @@ const props = withDefaults(
     minDuration: 280,
     maxDuration: 900,
     motionStyle: 'standard',
+    mirrorNativeClicks: true,
+    clickAnimationDuration: 120,
   },
 )
 
@@ -73,7 +78,9 @@ const isVisible = ref(props.visible)
 const isFollowing = ref(props.followMouse)
 const headingRad = ref(0)
 
-const interaction = useCursorInteraction()
+const interaction = useCursorInteraction({
+  animationDuration: props.clickAnimationDuration,
+})
 const motionStyleRef = computed(() => props.motionStyle)
 const motionStyleApi = useCursorMotionStyle(motionStyleRef)
 
@@ -194,6 +201,59 @@ function getPosition(): Point {
   return { ...pos.value }
 }
 
+async function click(options: ClickOptions = {}): Promise<void> {
+  await interaction.click({
+    ...options,
+    delayMs: options.delayMs ?? props.clickAnimationDuration,
+    clientX: pos.value.x,
+    clientY: pos.value.y,
+  })
+}
+
+async function clickAt(
+  target: number | string | Element,
+  yOrOptions?: number | ClickOptions,
+  maybeOptions?: ClickOptions,
+): Promise<void> {
+  let point: Point
+  let options: ClickOptions = {}
+
+  if (typeof target === 'number') {
+    point = resolveMoveTarget(target, yOrOptions as number)
+    options = maybeOptions ?? {}
+  } else {
+    point = resolveMoveTarget(target)
+    options = (yOrOptions as ClickOptions | undefined) ?? {}
+  }
+
+  if (options.move !== false) {
+    await moveTo(point.x, point.y, { animate: options.animate !== false })
+  } else {
+    jumpTo(point, applyFrame)
+  }
+
+  await click(options)
+}
+
+async function leftClick(options: Omit<ClickOptions, 'button'> = {}): Promise<void> {
+  await click({ ...options, button: 'left' })
+}
+
+async function rightClick(options: Omit<ClickOptions, 'button'> = {}): Promise<void> {
+  await click({ ...options, button: 'right' })
+}
+
+function onNativeMouseDown(event: MouseEvent) {
+  if (!props.mirrorNativeClicks || !isFollowing.value) return
+  if (event.button !== 0 && event.button !== 2) return
+  void interaction.press(event.button === 2 ? 'right' : 'left', props.clickAnimationDuration)
+}
+
+function onNativeMouseUp() {
+  if (!props.mirrorNativeClicks || !isFollowing.value) return
+  void interaction.release()
+}
+
 function onMouseMove(event: MouseEvent) {
   if (!isFollowing.value) return
   followTarget = { x: event.clientX, y: event.clientY }
@@ -226,16 +286,21 @@ function followTick() {
 function startFollowLoop() {
   if (followRaf) return
   window.addEventListener('mousemove', onMouseMove, { passive: true })
+  window.addEventListener('mousedown', onNativeMouseDown, true)
+  window.addEventListener('mouseup', onNativeMouseUp, true)
   followRaf = requestAnimationFrame(followTick)
 }
 
 function stopFollowLoop() {
   window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mousedown', onNativeMouseDown, true)
+  window.removeEventListener('mouseup', onNativeMouseUp, true)
   if (followRaf) {
     cancelAnimationFrame(followRaf)
     followRaf = 0
   }
   followTarget = null
+  void interaction.release()
 }
 
 function applyNativeCursorHide() {
@@ -312,6 +377,10 @@ defineExpose({
   moveTo,
   setFollow,
   getPosition,
+  click,
+  clickAt,
+  leftClick,
+  rightClick,
 })
 </script>
 

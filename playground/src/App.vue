@@ -86,6 +86,27 @@ function onHide() {
 function onDemoClick() {
   clickCount.value += 1
 }
+
+async function visualClickDemo() {
+  if (!cursorRef.value) return
+  visible.value = true
+  followMouse.value = false
+  await cursorRef.value.leftClick({ real: false })
+}
+
+async function realClickDemo() {
+  if (!cursorRef.value) return
+  visible.value = true
+  followMouse.value = false
+  await cursorRef.value.clickAt('#demo-button', { real: true, button: 'left' })
+}
+
+async function rightClickDemo() {
+  if (!cursorRef.value) return
+  visible.value = true
+  followMouse.value = false
+  await cursorRef.value.rightClick({ real: false })
+}
 </script>
 
 <template>
@@ -225,6 +246,30 @@ function onDemoClick() {
             Move to #demo-button
           </button>
         </div>
+
+        <div class="row">
+          <button
+            type="button"
+            data-testid="btn-click-visual"
+            @click="visualClickDemo"
+          >
+            Left click (visual)
+          </button>
+          <button
+            type="button"
+            data-testid="btn-click-real"
+            @click="realClickDemo"
+          >
+            Left click (real) on #demo-button
+          </button>
+          <button
+            type="button"
+            data-testid="btn-click-right"
+            @click="rightClickDemo"
+          >
+            Right click (visual)
+          </button>
+        </div>
       </div>
 
       <div ref="stageRef" class="stage" data-testid="stage">
@@ -269,7 +314,7 @@ function onDemoClick() {
     </section>
 
     <section class="panel">
-      <h2>API (phase 1)</h2>
+      <h2>API</h2>
       <table class="api-table">
         <thead>
           <tr>
@@ -293,6 +338,13 @@ function onDemoClick() {
           <tr>
             <td><code>setFollow(boolean)</code></td>
             <td>Follow the real pointer</td>
+          </tr>
+          <tr>
+            <td><code>click</code> / <code>clickAt</code></td>
+            <td>
+              Press animation; <code>real: true</code> dispatches DOM events
+              (synthetic events may not open native menus)
+            </td>
           </tr>
           <tr>
             <td><code>shape</code> / <code>stroke</code> / <code>fill</code></td>
