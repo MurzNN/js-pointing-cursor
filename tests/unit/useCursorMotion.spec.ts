@@ -87,7 +87,7 @@ describe('animateAlong', () => {
 
   it('can be cancelled', async () => {
     const caf = vi.fn()
-    let now = 0
+    const now = 0
     const callbacks: FrameRequestCallback[] = []
     const handle = animateAlong(
       createCurvedPath({ x: 0, y: 0 }, { x: 10, y: 0 }, () => 0.5),

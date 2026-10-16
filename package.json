@@ -47,7 +47,7 @@
     "build:playground": "pnpm registry:build && vite build --config playground/vite.config.ts",
     "registry:build": "shadcn-vue build --output playground/public/r",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --workers=1",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
@@ -61,6 +61,7 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.36.0",
     "eslint-plugin-vue": "^10.4.0",
+    "globals": "^17.13.0",
     "jsdom": "^26.1.0",
     "shadcn-vue": "^2.8.2",
     "typescript": "~5.9.2",
