@@ -112,4 +112,42 @@ describe('VueCursor', () => {
     wrapper.unmount()
     vi.useRealTimers()
   })
+
+  it('spawns a green burst on left click and red on right', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(VueCursor, {
+      props: {
+        x: 40,
+        y: 50,
+        clickAnimationDuration: 40,
+        clickBurstDurationMs: 200,
+      },
+      attachTo: document.body,
+    })
+    const api = wrapper.vm as unknown as {
+      leftClick: (o?: { real?: boolean }) => Promise<void>
+      rightClick: (o?: { real?: boolean }) => Promise<void>
+    }
+
+    const leftPending = api.leftClick({ real: false })
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('.vue-cursor-burst').exists()).toBe(true)
+    expect(wrapper.find('.vue-cursor-burst line').attributes('stroke')).toBe(
+      '#22c55e',
+    )
+    await vi.advanceTimersByTimeAsync(40)
+    await leftPending
+
+    const rightPending = api.rightClick({ real: false })
+    await wrapper.vm.$nextTick()
+    const strokes = wrapper
+      .findAll('.vue-cursor-burst line')
+      .map((l) => l.attributes('stroke'))
+    expect(strokes).toContain('#ef4444')
+    await vi.advanceTimersByTimeAsync(40)
+    await rightPending
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
 })

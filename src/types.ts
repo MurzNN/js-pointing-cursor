@@ -29,6 +29,15 @@ export interface ClickOptions {
   animate?: boolean
   move?: boolean
   delayMs?: number
+  /** Show the radiating-lines burst at the click point (default: component `clickBurst` prop). */
+  burst?: boolean
+}
+
+export interface ClickBurstInstance {
+  id: number
+  x: number
+  y: number
+  color: string
 }
 
 export type MoveTarget = string | Element | Point

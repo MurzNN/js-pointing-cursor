@@ -6,7 +6,7 @@ An oversized Vue 3 cursor with curved, human-like motion, follow mode, replaceab
 
 ## Features
 
-- Configurable size (default `2em`) with bundled **arrow**, **pointer**, and **hand** shapes
+- Configurable size (default `3em`) with bundled **arrow**, **pointer**, and **hand** shapes
 - `stroke`, `fill`, and `strokeWidth` for bundled SVGs
 - `show()` / `hide()` and programmatic `moveTo`
 - Move to viewport coordinates **or** a CSS selector / `Element` (element center)
@@ -65,11 +65,11 @@ async function tour() {
   <VueCursor
     ref="cursor"
     shape="arrow"
-    size="2.5em"
+    size="3em"
     stroke="#111"
     fill="#fff"
     :stroke-width="2"
-    motion-style="standard"
+    motion-style="dangling"
   />
   <button id="signup" type="button" @click="tour">Tour</button>
 </template>
@@ -91,7 +91,7 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 
 | Prop | Default | Description |
 | --- | --- | --- |
-| `size` | `'2em'` | CSS length for the cursor box |
+| `size` | `'3em'` | CSS length for the cursor box |
 | `shape` | `'arrow'` | `'arrow' \| 'pointer' \| 'hand'` |
 | `stroke` / `fill` / `strokeWidth` | black / white / `2` | Bundled SVG styling |
 | `visible` | `true` | Show the cursor |
@@ -101,10 +101,16 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 | `hotspotX` / `hotspotY` | per shape | Hotspot as 0–1 fractions of the box |
 | `zIndex` | `9999` | Stacking order |
 | `minDuration` / `maxDuration` | `280` / `900` | Motion duration clamps (ms) |
-| `motionStyle` | `'standard'` | `'standard'` or `'dangling'` |
+| `motionStyle` | `'dangling'` | `'standard'` or `'dangling'` |
 | `defaultAngle` | per shape | Tip offset from pointing up at rest (`arrow`/`pointer` −45°, `hand` 0°); used by dangling aiming |
 | `mirrorNativeClicks` | `true` while following | Mirror real button presses visually |
 | `clickAnimationDuration` | `120` | Press animation duration (ms) |
+| `clickBurst` | `true` | Radiating 8-line spark at the click hotspot |
+| `clickBurstStrokeWidth` | `2` | Burst line stroke width |
+| `clickBurstSize` | `'2.25em'` | Burst graphic size |
+| `clickBurstLeftColor` | `'#22c55e'` | Left-click burst color |
+| `clickBurstRightColor` | `'#ef4444'` | Right-click burst color |
+| `clickBurstColor` | `'#111111'` | Fallback burst stroke color |
 
 ### Methods (`ref`)
 

@@ -22,6 +22,10 @@
           "type": "registry:ui"
         },
         {
+          "path": "src/components/VueCursor/ClickBurst.vue",
+          "type": "registry:ui"
+        },
+        {
           "path": "src/shapes/ArrowCursor.vue",
           "type": "registry:ui"
         },

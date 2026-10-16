@@ -22,9 +22,12 @@ import {
 import { useCursorInteraction } from '../../composables/useCursorInteraction'
 import { useCursorMotionStyle } from '../../composables/useCursorMotionStyle'
 import { resolveMoveTarget } from '../../utils/resolveTarget'
+import ClickBurst from './ClickBurst.vue'
 import type {
+  ClickBurstInstance,
   ClickOptions,
   MotionStyle,
+  MouseButton,
   MoveToOptions,
   Point,
   ShapeName,
@@ -55,9 +58,20 @@ const props = withDefaults(
     defaultAngle?: number
     mirrorNativeClicks?: boolean
     clickAnimationDuration?: number
+    /** Radiating-lines spark at the click hotspot. */
+    clickBurst?: boolean
+    clickBurstStrokeWidth?: number | string
+    clickBurstSize?: string
+    clickBurstDurationMs?: number
+    /** Left-click burst color (default green). */
+    clickBurstLeftColor?: string
+    /** Right-click burst color (default red). */
+    clickBurstRightColor?: string
+    /** Fallback stroke color when a button-specific color is not used. */
+    clickBurstColor?: string
   }>(),
   {
-    size: '2em',
+    size: '3em',
     shape: 'arrow',
     stroke: '#111111',
     fill: '#ffffff',
@@ -70,10 +84,17 @@ const props = withDefaults(
     zIndex: 9999,
     minDuration: 280,
     maxDuration: 900,
-    motionStyle: 'standard',
+    motionStyle: 'dangling',
     defaultAngle: undefined,
     mirrorNativeClicks: true,
     clickAnimationDuration: 120,
+    clickBurst: true,
+    clickBurstStrokeWidth: 2,
+    clickBurstSize: '2.25em',
+    clickBurstDurationMs: 420,
+    clickBurstLeftColor: '#22c55e',
+    clickBurstRightColor: '#ef4444',
+    clickBurstColor: '#111111',
   },
 )
 
@@ -110,6 +131,29 @@ let motionHandle: AnimateHandle | null = null
 let followRaf = 0
 let followTarget: Point | null = null
 let nativeCursorBackup = ''
+let burstSeq = 0
+const bursts = ref<ClickBurstInstance[]>([])
+
+function burstColorFor(button: MouseButton): string {
+  if (button === 'right') return props.clickBurstRightColor
+  if (button === 'left') return props.clickBurstLeftColor
+  return props.clickBurstColor
+}
+
+function spawnBurst(button: MouseButton, at: Point = pos.value) {
+  if (!props.clickBurst) return
+  const id = ++burstSeq
+  bursts.value.push({
+    id,
+    x: at.x,
+    y: at.y,
+    color: burstColorFor(button),
+  })
+}
+
+function removeBurst(id: number) {
+  bursts.value = bursts.value.filter((b) => b.id !== id)
+}
 
 const shapeComponent = computed(() => SHAPE_COMPONENTS[props.shape])
 
@@ -229,8 +273,13 @@ function getPosition(): Point {
 }
 
 async function click(options: ClickOptions = {}): Promise<void> {
+  const button = options.button ?? 'left'
+  const showBurst = options.burst ?? props.clickBurst
+  if (showBurst) spawnBurst(button, pos.value)
+
   await interaction.click({
     ...options,
+    button,
     delayMs: options.delayMs ?? props.clickAnimationDuration,
     clientX: pos.value.x,
     clientY: pos.value.y,
@@ -273,7 +322,9 @@ async function rightClick(options: Omit<ClickOptions, 'button'> = {}): Promise<v
 function onNativeMouseDown(event: MouseEvent) {
   if (!props.mirrorNativeClicks || !isFollowing.value) return
   if (event.button !== 0 && event.button !== 2) return
-  void interaction.press(event.button === 2 ? 'right' : 'left', props.clickAnimationDuration)
+  const button: MouseButton = event.button === 2 ? 'right' : 'left'
+  spawnBurst(button, { x: event.clientX, y: event.clientY })
+  void interaction.press(button, props.clickAnimationDuration)
 }
 
 function onNativeMouseUp() {
@@ -453,5 +504,28 @@ defineExpose({
         />
       </slot>
     </div>
+  </div>
+
+  <div
+    v-for="burst in bursts"
+    :key="burst.id"
+    class="vue-cursor-burst"
+    aria-hidden="true"
+    :style="{
+      position: 'fixed',
+      left: `${burst.x}px`,
+      top: `${burst.y}px`,
+      zIndex: zIndex + 1,
+      pointerEvents: 'none',
+      transform: 'translate(-50%, -50%)',
+    }"
+  >
+    <ClickBurst
+      :color="burst.color"
+      :stroke-width="clickBurstStrokeWidth"
+      :size="clickBurstSize"
+      :duration-ms="clickBurstDurationMs"
+      @done="removeBurst(burst.id)"
+    />
   </div>
 </template>

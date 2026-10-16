@@ -15,11 +15,11 @@ const shape = ref<ShapeName>('arrow')
 const stroke = ref('#111111')
 const fill = ref('#ffffff')
 const strokeWidth = ref(2)
-const size = ref('2.5em')
-const motionStyle = ref<MotionStyle>('standard')
+const size = ref('3em')
+const motionStyle = ref<MotionStyle>('dangling')
 
 const shapeOptions: ShapeName[] = ['arrow', 'pointer', 'hand']
-const sizeOptions = ['1.5em', '2em', '2.5em', '3.5em'] as const
+const sizeOptions = ['1em', '2em', '3em', '5em'] as const
 const motionStyleOptions: MotionStyle[] = ['standard', 'dangling']
 
 const clickCount = ref(0)
@@ -263,7 +263,7 @@ async function rightClickDemo() {
             data-testid="btn-click-visual"
             @click="visualClickDemo"
           >
-            Left click (visual)
+            Left click (visual, green burst)
           </button>
           <button
             type="button"
@@ -277,7 +277,7 @@ async function rightClickDemo() {
             data-testid="btn-click-right"
             @click="rightClickDemo"
           >
-            Right click (visual)
+            Right click (visual, red burst)
           </button>
         </div>
       </div>
