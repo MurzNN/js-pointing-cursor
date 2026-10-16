@@ -1,0 +1,74 @@
+{
+  "name": "vue-cursor",
+  "version": "0.1.0",
+  "description": "A Vue 3 oversized cursor component with curved motion, follow mode, click animation, and replaceable SVG shapes.",
+  "keywords": [
+    "vue",
+    "vue3",
+    "cursor",
+    "pointer",
+    "animation",
+    "svg",
+    "shadcn-vue"
+  ],
+  "author": "Alexey Murz Korepov",
+  "license": "MIT",
+  "homepage": "https://murznn.github.io/vue-cursor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MurzNN/vue-cursor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MurzNN/vue-cursor/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src",
+    "registry.json"
+  ],
+  "main": "./dist/vue-cursor.cjs",
+  "module": "./dist/vue-cursor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-cursor.js",
+      "require": "./dist/vue-cursor.cjs"
+    }
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "scripts": {
+    "dev": "vite --config playground/vite.config.ts",
+    "build": "vite build",
+    "build:playground": "pnpm registry:build && vite build --config playground/vite.config.ts",
+    "registry:build": "shadcn-vue build --output playground/public/r",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.18.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-vue": "^10.4.0",
+    "jsdom": "^26.1.0",
+    "shadcn-vue": "^2.8.2",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.44.0",
+    "unplugin-dts": "^1.0.0-beta.6",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4",
+    "vue": "^3.5.21",
+    "vue-eslint-parser": "^10.2.0",
+    "vue-tsc": "^3.0.7"
+  }
+}

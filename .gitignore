@@ -1,0 +1,12 @@
+node_modules
+dist
+playground-dist
+test-results
+playwright-report
+*.local
+.DS_Store
+.idea
+.vscode
+*.tsbuildinfo
+.eslintcache
+coverage
