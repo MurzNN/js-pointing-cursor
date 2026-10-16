@@ -13,6 +13,18 @@ describe('VueCursor', () => {
     wrapper.unmount()
   })
 
+  it('forwards fallthrough attrs to the cursor root (multi-root template)', () => {
+    const wrapper = mount(VueCursor, {
+      props: { x: 100, y: 100 },
+      attrs: { 'data-testid': 'vue-cursor' },
+      attachTo: document.body,
+    })
+    expect(wrapper.find('.vue-cursor').attributes('data-testid')).toBe(
+      'vue-cursor',
+    )
+    wrapper.unmount()
+  })
+
   it('exposes show/hide and toggles visibility', async () => {
     const wrapper = mount(VueCursor, {
       props: { x: 10, y: 10, visible: true },

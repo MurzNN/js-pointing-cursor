@@ -480,8 +480,10 @@ defineExpose({
 </script>
 
 <template>
+  <!-- Multi-root (cursor + bursts): fallthrough attrs must be bound explicitly. -->
   <div
     class="vue-cursor"
+    v-bind="$attrs"
     :class="[`vue-cursor--${shape}`, { 'vue-cursor--hidden': !isVisible }]"
     :style="outerStyle"
     aria-hidden="true"
