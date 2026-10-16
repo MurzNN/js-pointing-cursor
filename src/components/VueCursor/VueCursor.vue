@@ -7,7 +7,11 @@ import {
   watch,
   type CSSProperties,
 } from 'vue'
-import { SHAPE_COMPONENTS, SHAPE_HOTSPOTS } from '../../shapes'
+import {
+  SHAPE_COMPONENTS,
+  SHAPE_DEFAULT_ANGLES,
+  SHAPE_HOTSPOTS,
+} from '../../shapes'
 import {
   animateAlong,
   createCurvedPath,
@@ -44,6 +48,11 @@ const props = withDefaults(
     minDuration?: number
     maxDuration?: number
     motionStyle?: MotionStyle
+    /**
+     * Tip offset from pointing up at rest (degrees). When omitted, uses the
+     * bundled shape default (arrow/pointer -45, hand 0).
+     */
+    defaultAngle?: number
     mirrorNativeClicks?: boolean
     clickAnimationDuration?: number
   }>(),
@@ -62,6 +71,7 @@ const props = withDefaults(
     minDuration: 280,
     maxDuration: 900,
     motionStyle: 'standard',
+    defaultAngle: undefined,
     mirrorNativeClicks: true,
     clickAnimationDuration: 120,
   },
@@ -82,7 +92,12 @@ const interaction = useCursorInteraction({
   animationDuration: props.clickAnimationDuration,
 })
 const localMotionStyle = ref<MotionStyle>(props.motionStyle)
-const motionStyleApi = useCursorMotionStyle(localMotionStyle)
+const effectiveDefaultAngle = computed(
+  () => props.defaultAngle ?? SHAPE_DEFAULT_ANGLES[props.shape],
+)
+const motionStyleApi = useCursorMotionStyle(localMotionStyle, {
+  defaultAngle: effectiveDefaultAngle,
+})
 watch(
   () => props.motionStyle,
   (value) => {

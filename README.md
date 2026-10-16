@@ -102,6 +102,7 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 | `zIndex` | `9999` | Stacking order |
 | `minDuration` / `maxDuration` | `280` / `900` | Motion duration clamps (ms) |
 | `motionStyle` | `'standard'` | `'standard'` or `'dangling'` |
+| `defaultAngle` | per shape | Tip offset from pointing up at rest (`arrow`/`pointer` −45°, `hand` 0°); used by dangling aiming |
 | `mirrorNativeClicks` | `true` while following | Mirror real button presses visually |
 | `clickAnimationDuration` | `120` | Press animation duration (ms) |
 

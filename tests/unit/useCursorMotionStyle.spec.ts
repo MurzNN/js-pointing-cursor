@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
 import {
-  headingToTilt,
+  headingToRotation,
   useCursorMotionStyle,
 } from '../../src/composables/useCursorMotionStyle'
 import type { MotionFrame } from '../../src/types'
@@ -18,15 +18,29 @@ function frame(partial: Partial<MotionFrame>): MotionFrame {
   }
 }
 
+describe('headingToRotation', () => {
+  it('aims hand (defaultAngle 0) straight down when traveling down', () => {
+    // travel down = π/2; tip was up → ±180° CSS rotate
+    expect(Math.abs(headingToRotation(Math.PI / 2, 0))).toBeCloseTo(180, 5)
+  })
+
+  it('aims hand left when traveling left', () => {
+    // 270° normalizes to -90°
+    expect(headingToRotation(Math.PI, 0)).toBeCloseTo(-90, 5)
+  })
+
+  it('compensates arrow defaultAngle (-45) when traveling down', () => {
+    // 225° normalizes to -135°
+    expect(headingToRotation(Math.PI / 2, -45)).toBeCloseTo(-135, 5)
+  })
+})
+
 describe('useCursorMotionStyle', () => {
   beforeEach(() => {
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      (cb: FrameRequestCallback) => {
-        cb(0)
-        return 1
-      },
-    )
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0)
+      return 1
+    })
     vi.stubGlobal('cancelAnimationFrame', vi.fn())
   })
 
@@ -36,37 +50,36 @@ describe('useCursorMotionStyle', () => {
 
   it('keeps rotation at 0 for standard', () => {
     const style = ref<'standard' | 'dangling'>('standard')
-    const api = useCursorMotionStyle(style)
+    const api = useCursorMotionStyle(style, { defaultAngle: -45 })
     api.beginTravel({ x: 0, y: 0 }, { x: -100, y: 0 })
     api.onFrame(frame({ headingRad: Math.PI / 2, vx: 0, vy: 10 }))
     expect(api.rotationDeg.value).toBe(0)
   })
 
-  it('tilts from overall travel so tip leads; ignores tangent flips', () => {
-    expect(headingToTilt(Math.PI, 60)).toBeLessThan(0)
-    expect(headingToTilt(0, 60)).toBeGreaterThan(0)
-
+  it('points along overall travel including down; ignores tangent flips', () => {
     const style = ref<'standard' | 'dangling'>('dangling')
-    const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
-    api.beginTravel({ x: 200, y: 100 }, { x: 40, y: 100 })
+    const defaultAngle = ref(-45)
+    const api = useCursorMotionStyle(style, { spring: 1, defaultAngle })
 
-    api.onFrame(frame({ headingRad: 0, vx: 50, vy: 0, progress: 0.2 }))
-    expect(api.rotationDeg.value).toBeLessThan(0)
+    api.beginTravel({ x: 100, y: 0 }, { x: 100, y: 200 }) // down
+    api.onFrame(frame({ headingRad: 0, vx: 50, vy: 0, progress: 0.3 }))
+    expect(api.rotationDeg.value).toBeCloseTo(-135, 0)
 
+    api.beginTravel({ x: 200, y: 100 }, { x: 40, y: 100 }) // left
     api.onFrame(frame({ headingRad: Math.PI / 2, vx: 0, vy: 40, progress: 0.5 }))
-    expect(api.rotationDeg.value).toBeLessThan(0)
+    expect(api.rotationDeg.value).toBeCloseTo(-45, 0) // 315° → -45°
   })
 
   it('dangles from live velocity when following (no beginTravel)', () => {
     const style = ref<'standard' | 'dangling'>('dangling')
-    const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
-    api.onFrame(frame({ vx: -30, vy: 0, headingRad: Math.PI, progress: 0 }))
-    expect(api.rotationDeg.value).toBeLessThan(0)
+    const api = useCursorMotionStyle(style, { spring: 1, defaultAngle: 0 })
+    api.onFrame(frame({ vx: 0, vy: 30, headingRad: Math.PI / 2, progress: 0 }))
+    expect(Math.abs(api.rotationDeg.value)).toBeCloseTo(180, 0)
   })
 
   it('settles back to rest after motion stops', () => {
     const style = ref<'standard' | 'dangling'>('dangling')
-    const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
+    const api = useCursorMotionStyle(style, { spring: 1, defaultAngle: -45 })
     api.beginTravel({ x: 0, y: 0 }, { x: 100, y: 0 })
     api.onFrame(frame({ progress: 0.4 }))
     expect(api.rotationDeg.value).not.toBe(0)

@@ -19,6 +19,7 @@ export {
   HandCursor,
   SHAPE_COMPONENTS,
   SHAPE_HOTSPOTS,
+  SHAPE_DEFAULT_ANGLES,
 } from './shapes'
 
 export { VueCursor }

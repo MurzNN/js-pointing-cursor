@@ -2,13 +2,17 @@ import { computed, ref, type Ref } from 'vue'
 import type { MotionFrame, MotionStyle, Point } from '../types'
 
 export interface UseCursorMotionStyleOptions {
-  /** Max absolute tilt in degrees while dangling. */
-  maxTiltDeg?: number
-  /** How quickly rotation chases target heading (0–1 per frame-ish). */
+  /**
+   * Tip orientation at CSS rotate(0), as offset from pointing **up** (degrees).
+   * Hand (finger up) = 0; arrow/pointer (tip up-left) ≈ -45.
+   * May be a ref/getter so it tracks the active shape.
+   */
+  defaultAngle?: number | Ref<number> | (() => number)
+  /** How quickly rotation chases the travel heading (0–1). */
   spring?: number
-  /** Resting angle in degrees (0 keeps SVG as drawn). */
+  /** Resting CSS rotation when idle (usually 0). */
   restDeg?: number
-  /** Speed (px) below which follow / free motion settles upright. */
+  /** Speed (px/frame-ish) below which follow motion settles upright. */
   settleSpeed?: number
 }
 
@@ -16,47 +20,70 @@ function radToDeg(rad: number): number {
   return (rad * 180) / Math.PI
 }
 
+/** Normalize to (-180, 180] so spring lerp takes the shortest turn. */
+export function normalizeDeg(deg: number): number {
+  return ((deg + 540) % 360) - 180
+}
+
 function lerpAngle(from: number, to: number, t: number): number {
   const diff = ((to - from + 540) % 360) - 180
   return from + diff * t
 }
 
-function clamp(n: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, n))
+function resolveNumber(
+  value: number | Ref<number> | (() => number) | undefined,
+  fallback: number,
+): number {
+  if (value == null) return fallback
+  if (typeof value === 'function') return value()
+  if (typeof value === 'object' && 'value' in value) return value.value
+  return value
 }
 
 /**
- * Tip is held; body trails behind travel so the tip leads.
- * CSS +rotation is clockwise — moving left (heading π) → CCW (negative)
- * so the bottom swings to the right of the tip.
+ * CSS rotation that aims the tip along `headingRad` (screen atan2: 0=east, 90=down).
+ * `defaultAngle` is the tip’s offset from pointing up at rest.
  */
-export function headingToTilt(headingRad: number, maxTilt: number): number {
-  const deg = 90 - radToDeg(headingRad)
-  return clamp(deg, -maxTilt, maxTilt)
+export function headingToRotation(
+  headingRad: number,
+  defaultAngle = 0,
+): number {
+  // Tip at rest points at (-90° + defaultAngle). Aim that at travel heading.
+  return normalizeDeg(radToDeg(headingRad) + 90 - defaultAngle)
+}
+
+/** @deprecated Use headingToRotation — kept for call-site clarity in older tests. */
+export function headingToTilt(
+  headingRad: number,
+  _maxTilt: number,
+  defaultAngle = 0,
+): number {
+  return headingToRotation(headingRad, defaultAngle)
 }
 
 /**
- * `standard` keeps rotation at 0.
- * `dangling` tilts from overall travel (scripted) or live velocity (follow),
- * then eases back to the resting angle when motion stops.
+ * `standard` keeps rotation at restDeg (0).
+ * `dangling` rotates so the tip points along travel (full range, including up/down).
  */
 export function useCursorMotionStyle(
   style: Ref<MotionStyle> | (() => MotionStyle),
   options: UseCursorMotionStyleOptions = {},
 ) {
-  const maxTilt = options.maxTiltDeg ?? 55
   const spring = options.spring ?? 0.22
   const restDeg = options.restDeg ?? 0
   const settleSpeed = options.settleSpeed ?? 1.2
 
   const rotationDeg = ref(restDeg)
   let settling = false
-  /** Locked heading for the current scripted move (atan2 of to − from). */
   let travelHeadingRad: number | null = null
   let settleRaf = 0
 
   function getStyle(): MotionStyle {
     return typeof style === 'function' ? style() : style.value
+  }
+
+  function getDefaultAngle(): number {
+    return resolveNumber(options.defaultAngle, 0)
   }
 
   function cancelSettleLoop() {
@@ -70,7 +97,6 @@ export function useCursorMotionStyle(
     return ((from - to + 540) % 360) - 180
   }
 
-  /** Ease back to restDeg on its own rAF loop (works after moveTo ends). */
   function startSettleLoop(): void {
     if (getStyle() !== 'dangling') {
       rotationDeg.value = restDeg
@@ -103,7 +129,6 @@ export function useCursorMotionStyle(
     settleRaf = requestAnimationFrame(tick)
   }
 
-  /** Call when a scripted moveTo starts so tilt follows intent, not path curvature. */
   function beginTravel(from: Point, to: Point): void {
     cancelSettleLoop()
     settling = false
@@ -116,8 +141,8 @@ export function useCursorMotionStyle(
     }
   }
 
-  function chaseTilt(headingRad: number): void {
-    const target = headingToTilt(headingRad, maxTilt)
+  function chaseHeading(headingRad: number): void {
+    const target = headingToRotation(headingRad, getDefaultAngle())
     rotationDeg.value = lerpAngle(rotationDeg.value, target, spring)
   }
 
@@ -130,7 +155,6 @@ export function useCursorMotionStyle(
       return
     }
 
-    // Scripted move with locked overall direction
     if (travelHeadingRad != null) {
       if (frame.progress >= 0.97) {
         startSettleLoop()
@@ -138,16 +162,15 @@ export function useCursorMotionStyle(
       }
       if (settling) cancelSettleLoop()
       settling = false
-      chaseTilt(travelHeadingRad)
+      chaseHeading(travelHeadingRad)
       return
     }
 
-    // Follow / free motion: tilt from live velocity, settle when nearly still
     const speed = Math.hypot(frame.vx, frame.vy)
     if (speed > settleSpeed) {
       if (settling) cancelSettleLoop()
       settling = false
-      chaseTilt(Math.atan2(frame.vy, frame.vx))
+      chaseHeading(Math.atan2(frame.vy, frame.vx))
       return
     }
 

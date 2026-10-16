@@ -14,7 +14,6 @@ export const SHAPE_COMPONENTS: Record<ShapeName, Component> = {
   hand: HandCursor,
 }
 
-/** Default hotspot as fractions of the shape box (origin top-left). */
 /**
  * Hotspots as fractions of each shape’s viewBox (tip of the cursor).
  * Arrow viewBox: -1 6 13.5 20.5 — tip ≈ (0.9, 8.1), box tight to glyph
@@ -25,4 +24,15 @@ export const SHAPE_HOTSPOTS: Record<ShapeName, { x: number; y: number }> = {
   arrow: { x: 0.14, y: 0.1 },
   pointer: { x: 0.19, y: 0.13 },
   hand: { x: 0.42, y: 0.06 },
+}
+
+/**
+ * Tip offset from pointing **up** at CSS rotate(0), in degrees.
+ * Hand index points up → 0. Arrow/pointer tips point up-left → -45.
+ * Used by dangling motion so the tip aims along travel.
+ */
+export const SHAPE_DEFAULT_ANGLES: Record<ShapeName, number> = {
+  arrow: -45,
+  pointer: -45,
+  hand: 0,
 }
