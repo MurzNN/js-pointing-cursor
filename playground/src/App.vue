@@ -17,6 +17,7 @@ const fill = ref('#ffffff')
 const strokeWidth = ref(2)
 const size = ref('3em')
 const motionStyle = ref<MotionStyle>('dangling')
+const clickBurst = ref(true)
 
 const shapeOptions: ShapeName[] = ['arrow', 'pointer', 'hand']
 const sizeOptions = ['1em', '2em', '3em', '5em'] as const
@@ -134,6 +135,7 @@ async function rightClickDemo() {
       :stroke-width="strokeWidth"
       :size="size"
       :motion-style="motionStyle"
+      :click-burst="clickBurst"
       data-testid="vue-cursor"
     />
 
@@ -196,8 +198,8 @@ async function rightClickDemo() {
             <input
               v-model.number="strokeWidth"
               type="range"
-              min="1"
-              max="5"
+              min="0.5"
+              max="2"
               step="0.5"
             />
             {{ strokeWidth }}
@@ -258,6 +260,14 @@ async function rightClickDemo() {
         </div>
 
         <div class="row">
+          <label>
+            <input
+              v-model="clickBurst"
+              type="checkbox"
+              data-testid="click-burst-toggle"
+            />
+            Click burst
+          </label>
           <button
             type="button"
             data-testid="btn-click-visual"

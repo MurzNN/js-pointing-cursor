@@ -515,7 +515,7 @@ defineExpose({
       position: 'fixed',
       left: `${burst.x}px`,
       top: `${burst.y}px`,
-      zIndex: zIndex + 1,
+      zIndex: zIndex - 1,
       pointerEvents: 'none',
       transform: 'translate(-50%, -50%)',
     }"
