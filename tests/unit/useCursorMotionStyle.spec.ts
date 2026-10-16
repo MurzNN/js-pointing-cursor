@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
 import {
   headingToTilt,
@@ -19,6 +19,21 @@ function frame(partial: Partial<MotionFrame>): MotionFrame {
 }
 
 describe('useCursorMotionStyle', () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      (cb: FrameRequestCallback) => {
+        cb(0)
+        return 1
+      },
+    )
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('keeps rotation at 0 for standard', () => {
     const style = ref<'standard' | 'dangling'>('standard')
     const api = useCursorMotionStyle(style)
@@ -33,9 +48,8 @@ describe('useCursorMotionStyle', () => {
 
     const style = ref<'standard' | 'dangling'>('dangling')
     const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
-    api.beginTravel({ x: 200, y: 100 }, { x: 40, y: 100 }) // leftward
+    api.beginTravel({ x: 200, y: 100 }, { x: 40, y: 100 })
 
-    // Bézier tangent may point the "wrong" way mid-curve — tilt must stay left-leading.
     api.onFrame(frame({ headingRad: 0, vx: 50, vy: 0, progress: 0.2 }))
     expect(api.rotationDeg.value).toBeLessThan(0)
 
@@ -43,16 +57,21 @@ describe('useCursorMotionStyle', () => {
     expect(api.rotationDeg.value).toBeLessThan(0)
   })
 
-  it('settles back toward rest on completion', () => {
+  it('dangles from live velocity when following (no beginTravel)', () => {
+    const style = ref<'standard' | 'dangling'>('dangling')
+    const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
+    api.onFrame(frame({ vx: -30, vy: 0, headingRad: Math.PI, progress: 0 }))
+    expect(api.rotationDeg.value).toBeLessThan(0)
+  })
+
+  it('settles back to rest after motion stops', () => {
     const style = ref<'standard' | 'dangling'>('dangling')
     const api = useCursorMotionStyle(style, { spring: 1, maxTiltDeg: 60 })
     api.beginTravel({ x: 0, y: 0 }, { x: 100, y: 0 })
     api.onFrame(frame({ progress: 0.4 }))
-    const mid = api.rotationDeg.value
+    expect(api.rotationDeg.value).not.toBe(0)
+
     api.onSettle()
-    api.onFrame(frame({ progress: 1 }))
-    api.onFrame(frame({ progress: 1 }))
-    expect(Math.abs(api.rotationDeg.value)).toBeLessThan(Math.abs(mid) + 0.01)
-    expect(Math.abs(api.rotationDeg.value)).toBeLessThan(1)
+    expect(api.rotationDeg.value).toBe(0)
   })
 })

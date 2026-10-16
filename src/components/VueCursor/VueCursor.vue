@@ -201,9 +201,9 @@ function setFollow(enabled: boolean) {
   if (!enabled) {
     stopFollowLoop()
     restoreNativeCursor()
+    // Return to resting angle when follow stops.
+    motionStyleApi.onSettle()
   } else {
-    // Dangling is for scripted moves; keep upright while following.
-    motionStyleApi.reset()
     startFollowLoop()
     applyNativeCursorHide()
   }
@@ -282,6 +282,7 @@ function followTick() {
       y: pos.value.y + dy * 0.45,
     }
     headingRad.value = Math.atan2(dy, dx)
+    // progress stays < 1 so dangling treats this as live follow velocity
     motionStyleApi.onFrame({
       x: pos.value.x,
       y: pos.value.y,
@@ -291,6 +292,16 @@ function followTick() {
       progress: 0,
     })
     emit('move', { ...pos.value })
+  } else {
+    // No recent pointer sample — ease upright
+    motionStyleApi.onFrame({
+      x: pos.value.x,
+      y: pos.value.y,
+      vx: 0,
+      vy: 0,
+      headingRad: 0,
+      progress: 0,
+    })
   }
   followRaf = requestAnimationFrame(followTick)
 }

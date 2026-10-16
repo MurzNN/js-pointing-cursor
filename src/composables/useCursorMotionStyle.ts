@@ -8,6 +8,8 @@ export interface UseCursorMotionStyleOptions {
   spring?: number
   /** Resting angle in degrees (0 keeps SVG as drawn). */
   restDeg?: number
+  /** Speed (px) below which follow / free motion settles upright. */
+  settleSpeed?: number
 }
 
 function radToDeg(rad: number): number {
@@ -35,8 +37,8 @@ export function headingToTilt(headingRad: number, maxTilt: number): number {
 
 /**
  * `standard` keeps rotation at 0.
- * `dangling` tilts from the **overall** travel direction (not the Bézier tangent),
- * so curved paths do not flip the cursor mid-move.
+ * `dangling` tilts from overall travel (scripted) or live velocity (follow),
+ * then eases back to the resting angle when motion stops.
  */
 export function useCursorMotionStyle(
   style: Ref<MotionStyle> | (() => MotionStyle),
@@ -45,18 +47,65 @@ export function useCursorMotionStyle(
   const maxTilt = options.maxTiltDeg ?? 55
   const spring = options.spring ?? 0.22
   const restDeg = options.restDeg ?? 0
+  const settleSpeed = options.settleSpeed ?? 1.2
 
   const rotationDeg = ref(restDeg)
   let settling = false
   /** Locked heading for the current scripted move (atan2 of to − from). */
   let travelHeadingRad: number | null = null
+  let settleRaf = 0
 
   function getStyle(): MotionStyle {
     return typeof style === 'function' ? style() : style.value
   }
 
+  function cancelSettleLoop() {
+    if (settleRaf) {
+      cancelAnimationFrame(settleRaf)
+      settleRaf = 0
+    }
+  }
+
+  function angleError(from: number, to: number): number {
+    return ((from - to + 540) % 360) - 180
+  }
+
+  /** Ease back to restDeg on its own rAF loop (works after moveTo ends). */
+  function startSettleLoop(): void {
+    if (getStyle() !== 'dangling') {
+      rotationDeg.value = restDeg
+      travelHeadingRad = null
+      settling = false
+      return
+    }
+    settling = true
+    travelHeadingRad = null
+    cancelSettleLoop()
+
+    const tick = () => {
+      if (!settling || getStyle() !== 'dangling') {
+        settleRaf = 0
+        return
+      }
+      rotationDeg.value = lerpAngle(
+        rotationDeg.value,
+        restDeg,
+        Math.min(1, spring * 1.6),
+      )
+      if (Math.abs(angleError(rotationDeg.value, restDeg)) < 0.4) {
+        rotationDeg.value = restDeg
+        settling = false
+        settleRaf = 0
+        return
+      }
+      settleRaf = requestAnimationFrame(tick)
+    }
+    settleRaf = requestAnimationFrame(tick)
+  }
+
   /** Call when a scripted moveTo starts so tilt follows intent, not path curvature. */
   function beginTravel(from: Point, to: Point): void {
+    cancelSettleLoop()
     settling = false
     const dx = to.x - from.x
     const dy = to.y - from.y
@@ -67,48 +116,52 @@ export function useCursorMotionStyle(
     }
   }
 
+  function chaseTilt(headingRad: number): void {
+    const target = headingToTilt(headingRad, maxTilt)
+    rotationDeg.value = lerpAngle(rotationDeg.value, target, spring)
+  }
+
   function onFrame(frame: MotionFrame): void {
     if (getStyle() !== 'dangling') {
+      cancelSettleLoop()
       rotationDeg.value = restDeg
       settling = false
       travelHeadingRad = null
       return
     }
 
-    // Only settle at the end of the move — do not use Bézier speed (it dips mid-curve).
-    if (frame.progress >= 0.97) {
-      settling = true
-    }
-
-    if (settling) {
-      rotationDeg.value = lerpAngle(rotationDeg.value, restDeg, Math.min(1, spring * 1.5))
-      const err = ((rotationDeg.value - restDeg + 540) % 360) - 180
-      if (Math.abs(err) < 0.5) {
-        rotationDeg.value = restDeg
-        settling = false
-        travelHeadingRad = null
+    // Scripted move with locked overall direction
+    if (travelHeadingRad != null) {
+      if (frame.progress >= 0.97) {
+        startSettleLoop()
+        return
       }
+      if (settling) cancelSettleLoop()
+      settling = false
+      chaseTilt(travelHeadingRad)
       return
     }
 
-    if (travelHeadingRad == null) {
+    // Follow / free motion: tilt from live velocity, settle when nearly still
+    const speed = Math.hypot(frame.vx, frame.vy)
+    if (speed > settleSpeed) {
+      if (settling) cancelSettleLoop()
+      settling = false
+      chaseTilt(Math.atan2(frame.vy, frame.vx))
       return
     }
 
-    const target = headingToTilt(travelHeadingRad, maxTilt)
-    rotationDeg.value = lerpAngle(rotationDeg.value, target, spring)
+    if (!settling && Math.abs(angleError(rotationDeg.value, restDeg)) > 0.4) {
+      startSettleLoop()
+    }
   }
 
   function onSettle(): void {
-    if (getStyle() !== 'dangling') {
-      rotationDeg.value = restDeg
-      travelHeadingRad = null
-      return
-    }
-    settling = true
+    startSettleLoop()
   }
 
   function reset(): void {
+    cancelSettleLoop()
     rotationDeg.value = restDeg
     settling = false
     travelHeadingRad = null
