@@ -81,8 +81,15 @@ const headingRad = ref(0)
 const interaction = useCursorInteraction({
   animationDuration: props.clickAnimationDuration,
 })
-const motionStyleRef = computed(() => props.motionStyle)
-const motionStyleApi = useCursorMotionStyle(motionStyleRef)
+const localMotionStyle = ref<MotionStyle>(props.motionStyle)
+const motionStyleApi = useCursorMotionStyle(localMotionStyle)
+watch(
+  () => props.motionStyle,
+  (value) => {
+    localMotionStyle.value = value
+    if (value === 'standard') motionStyleApi.reset()
+  },
+)
 
 let motionHandle: AnimateHandle | null = null
 let followRaf = 0
@@ -371,6 +378,11 @@ onBeforeUnmount(() => {
   restoreNativeCursor()
 })
 
+function setMotionStyle(style: MotionStyle) {
+  localMotionStyle.value = style
+  if (style === 'standard') motionStyleApi.reset()
+}
+
 defineExpose({
   show,
   hide,
@@ -381,6 +393,7 @@ defineExpose({
   clickAt,
   leftClick,
   rightClick,
+  setMotionStyle,
 })
 </script>
 

@@ -211,7 +211,7 @@ async function rightClickDemo() {
             </select>
           </label>
           <span class="hint">
-            Dangling rotation ships in phase&nbsp;3; the control is wired for demos.
+            <code>dangling</code> rotates the cursor toward travel (first-pass spring; tune after testing).
           </span>
         </div>
 
