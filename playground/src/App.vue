@@ -18,7 +18,10 @@ const strokeWidth = ref(2)
 const size = ref('2.5em')
 const motionStyle = ref<MotionStyle>('standard')
 
-// Phase 2 placeholders kept in UI later
+const shapeOptions: ShapeName[] = ['arrow', 'pointer', 'hand']
+const sizeOptions = ['1.5em', '2em', '2.5em', '3.5em'] as const
+const motionStyleOptions: MotionStyle[] = ['standard', 'dangling']
+
 const clickCount = ref(0)
 
 const stageRef = ref<HTMLElement | null>(null)
@@ -163,24 +166,23 @@ async function rightClickDemo() {
           </label>
         </div>
 
+        <fieldset class="radio-group" data-testid="shape-select">
+          <legend>Shape</legend>
+          <label v-for="option in shapeOptions" :key="option" class="radio">
+            <input v-model="shape" type="radio" name="shape" :value="option" />
+            {{ option }}
+          </label>
+        </fieldset>
+
+        <fieldset class="radio-group" data-testid="size-select">
+          <legend>Size</legend>
+          <label v-for="option in sizeOptions" :key="option" class="radio">
+            <input v-model="size" type="radio" name="size" :value="option" />
+            {{ option }}
+          </label>
+        </fieldset>
+
         <div class="row">
-          <label>
-            Shape
-            <select v-model="shape" data-testid="shape-select">
-              <option value="arrow">arrow</option>
-              <option value="pointer">pointer</option>
-              <option value="hand">hand</option>
-            </select>
-          </label>
-          <label>
-            Size
-            <select v-model="size">
-              <option value="1.5em">1.5em</option>
-              <option value="2em">2em</option>
-              <option value="2.5em">2.5em</option>
-              <option value="3.5em">3.5em</option>
-            </select>
-          </label>
           <label>
             Stroke
             <input v-model="stroke" type="color" />
@@ -202,18 +204,26 @@ async function rightClickDemo() {
           </label>
         </div>
 
-        <div class="row">
-          <label>
-            Motion style
-            <select v-model="motionStyle" data-testid="motion-style">
-              <option value="standard">standard</option>
-              <option value="dangling">dangling</option>
-            </select>
+        <fieldset class="radio-group" data-testid="motion-style">
+          <legend>Motion style</legend>
+          <label
+            v-for="option in motionStyleOptions"
+            :key="option"
+            class="radio"
+          >
+            <input
+              v-model="motionStyle"
+              type="radio"
+              name="motion-style"
+              :value="option"
+            />
+            {{ option }}
           </label>
-          <span class="hint">
-            <code>dangling</code> rotates the cursor toward travel (first-pass spring; tune after testing).
-          </span>
-        </div>
+        </fieldset>
+        <p class="hint">
+          <code>dangling</code> rotates the cursor toward travel (first-pass
+          spring; tune after testing).
+        </p>
 
         <div class="row">
           <button

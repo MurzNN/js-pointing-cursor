@@ -27,9 +27,9 @@ test.describe('vue-cursor playground', () => {
     const markerBox = await marker.boundingBox()
     expect(markerBox).toBeTruthy()
 
-    // Cursor hotspot should land near the marker center
-    const cx = after!.x + after!.width * 0.12
-    const cy = after!.y + after!.height * 0.06
+    // Cursor hotspot should land near the marker center (arrow hotspot ~0.14, 0.10)
+    const cx = after!.x + after!.width * 0.14
+    const cy = after!.y + after!.height * 0.1
     const mx = markerBox!.x + markerBox!.width / 2
     const my = markerBox!.y + markerBox!.height / 2
     expect(Math.hypot(cx - mx, cy - my)).toBeLessThan(40)
@@ -45,17 +45,17 @@ test.describe('vue-cursor playground', () => {
     const b = await button.boundingBox()
     expect(c && b).toBeTruthy()
 
-    const cx = c!.x + c!.width * 0.12
-    const cy = c!.y + c!.height * 0.06
+    const cx = c!.x + c!.width * 0.14
+    const cy = c!.y + c!.height * 0.1
     const bx = b!.x + b!.width / 2
     const by = b!.y + b!.height / 2
     expect(Math.hypot(cx - bx, cy - by)).toBeLessThan(45)
   })
 
   test('can switch shapes', async ({ page }) => {
-    await page.getByTestId('shape-select').selectOption('hand')
+    await page.getByTestId('shape-select').getByLabel('hand', { exact: true }).check()
     await expect(page.locator('.vue-cursor-shape--hand')).toBeVisible()
-    await page.getByTestId('shape-select').selectOption('pointer')
+    await page.getByTestId('shape-select').getByLabel('pointer', { exact: true }).check()
     await expect(page.locator('.vue-cursor-shape--pointer')).toBeVisible()
   })
 

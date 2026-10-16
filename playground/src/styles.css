@@ -48,9 +48,9 @@ code {
 }
 
 button,
-select,
 input[type='color'],
-input[type='range'] {
+input[type='range'],
+input[type='radio'] {
   font: inherit;
 }
 
@@ -134,6 +134,39 @@ button.active {
   gap: 0.4rem;
   color: var(--muted);
   font-size: 0.95rem;
+}
+
+.radio-group {
+  margin: 0;
+  padding: 0.65rem 0.85rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgb(243 239 230 / 35%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  align-items: center;
+}
+
+.radio-group legend {
+  padding: 0 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.radio input {
+  accent-color: var(--accent);
+  margin: 0;
 }
 
 .stage {
