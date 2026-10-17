@@ -1,7 +1,9 @@
 node_modules
 .pnpm-store
 dist
+packages/*/dist
 playground-dist
+apps/*/dist
 test-results
 playwright-report
 *.local

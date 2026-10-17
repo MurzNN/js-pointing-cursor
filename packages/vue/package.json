@@ -1,0 +1,63 @@
+{
+  "name": "vue-pointing-cursor",
+  "version": "0.1.0",
+  "description": "Vue 3 oversized pointing cursor with curved motion, follow mode, and click burst.",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/vue-pointing-cursor.cjs",
+  "module": "./dist/vue-pointing-cursor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-pointing-cursor.js",
+      "require": "./dist/vue-pointing-cursor.cjs"
+    }
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "js-pointing-cursor": "workspace:*"
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.4",
+    "@types/node": "^22.18.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
+    "jsdom": "^26.1.0",
+    "typescript": "~5.9.2",
+    "unplugin-dts": "^1.0.0-beta.6",
+    "vite": "^7.1.7",
+    "vite-plugin-css-injected-by-js": "^5.0.2",
+    "vitest": "^3.2.4",
+    "vue": "^3.5.21",
+    "vue-tsc": "^3.0.7"
+  },
+  "license": "MIT",
+  "homepage": "https://murznn.github.io/js-pointing-cursor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MurzNN/js-pointing-cursor.git",
+    "directory": "packages/vue"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "cursor",
+    "pointer",
+    "animation",
+    "svg",
+    "shadcn-vue"
+  ]
+}

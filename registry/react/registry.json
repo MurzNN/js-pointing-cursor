@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "react-pointing-cursor",
+  "homepage": "https://murznn.github.io/js-pointing-cursor/",
+  "items": [
+    {
+      "name": "react-pointing-cursor",
+      "type": "registry:ui",
+      "title": "React Pointing Cursor",
+      "description": "An oversized React cursor with curved motion, follow mode, replaceable SVG shapes, and click animation.",
+      "author": "Alexey Murz Korepov",
+      "dependencies": ["react", "react-dom", "js-pointing-cursor"],
+      "categories": ["cursor", "animation"],
+      "docs": "Install react-pointing-cursor from npm, or copy sources from this monorepo. Demo: https://murznn.github.io/js-pointing-cursor/react/",
+      "files": [
+        {
+          "path": "packages/react/src/ReactPointingCursor.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/styles.css",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/index.ts",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

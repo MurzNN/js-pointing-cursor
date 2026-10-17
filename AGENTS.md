@@ -1,46 +1,46 @@
-# Agent guide for vue-cursor
+# Agent guide for js-pointing-cursor
 
-Instructions for humans and coding agents working in this repository.
+Instructions for humans and coding agents working in this monorepo.
 
 ## Source of truth
 
-- Canonical implementation lives under `src/`.
-- Do **not** create a parallel component tree under `registry/`.
-- `registry.json` lists files under `src/`; keep `files[]` in sync when adding or moving modules.
-- Run `pnpm registry:build` after registry catalog changes (output: `playground/public/r`).
+- **`packages/core`** (`js-pointing-cursor`) — framework-agnostic controller, motion, shapes, click burst
+- **`packages/vue`** (`vue-pointing-cursor`) — thin Vue adapter
+- **`packages/react`** (`react-pointing-cursor`) — thin React adapter
+- **`apps/playground-vue`** / **`apps/playground-react`** — demos
+- Do **not** recreate a parallel tree under the old root `src/`
+- `registry/vue/registry.json` lists files for shadcn-vue; run `pnpm registry:build` after catalog changes
 
 ## Architecture
 
 ```
-wrapper  translate3d(x,y) + hotspot offset   → position
-  inner  rotate(deg) scale(press)            → motion style + click
-    shape SVG / slot
+createCursorController (core)
+  → imperative paint on root/inner elements
+  → mountClickBurst on document.body
+VuePointingCursor / ReactPointingCursor → props/lifecycle/refs only
 ```
 
 | Concern | Module |
 | --- | --- |
-| Path + rAF | `src/composables/useCursorMotion.ts` |
-| Click press + optional real events | `src/composables/useCursorInteraction.ts` |
-| `standard` / `dangling` rotation | `src/composables/useCursorMotionStyle.ts` |
-| Coords / selector → point | `src/utils/resolveTarget.ts` |
-| Public component | `src/components/VueCursor/VueCursor.vue` |
+| Path + rAF | `packages/core/src/motion.ts` |
+| Click press + real events | `packages/core/src/interaction.ts` |
+| `standard` / `dangling` rotation | `packages/core/src/motionStyle.ts` |
+| Coords / selector → point | `packages/core/src/resolveTarget.ts` |
+| Click burst DOM | `packages/core/src/clickBurst.ts` |
+| Orchestration | `packages/core/src/createCursorController.ts` |
+| Vue shell | `packages/vue/src/VuePointingCursor.vue` |
+| React shell | `packages/react/src/ReactPointingCursor.tsx` |
 
 ## Rules
 
-- TypeScript only; types are generated into `dist/` by `unplugin-dts` — do not hand-maintain a parallel `index.d.ts` in `src/`.
-- No Tailwind / UnoCSS as a library dependency.
-- `moveTo` must keep **curved, randomized** Bézier motion (not linear CSS transitions).
-- Overlay stays `pointer-events: none`; real clicks use `elementFromPoint` + `dispatchEvent`.
-- Dangling physics belongs only in `useCursorMotionStyle` so path generation stays untouched.
-- Keep README and playground snippets aligned with the real API.
-
-## Commits
-
-Prefer one logical commit per feature step (scaffold, shapes, motion, component API, registry, playground, docs/CI, clicks, dangling). Follow the repo’s git safety rules (HEREDOC messages, no force-push, no config changes).
+- Core must have **zero** `vue` / `react` imports
+- TypeScript only; package types come from each package’s Vite/`unplugin-dts` build
+- No Tailwind / UnoCSS as a library dependency
+- `moveTo` must keep **curved, randomized** Bézier motion
+- Overlay stays `pointer-events: none`; real clicks use `elementFromPoint` + `dispatchEvent`
+- Keep README and playground snippets aligned with the real API
 
 ## Done checklist
-
-Before claiming work complete:
 
 ```bash
 pnpm typecheck

@@ -11,12 +11,12 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
-    // Local: prefer system Chrome when present. CI: Playwright's Chromium.
     ...(process.env.CI ? {} : { channel: 'chrome' as const }),
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'pnpm exec vite --config playground/vite.config.ts --host 127.0.0.1 --port 4173 --strictPort',
+    command:
+      'pnpm --filter @js-pointing-cursor/playground-vue exec vite --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

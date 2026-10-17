@@ -1,0 +1,39 @@
+.pointing-cursor {
+  will-change: transform;
+  contain: layout style;
+}
+
+.pointing-cursor__inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pointing-cursor__shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pointing-cursor__shape .pointing-cursor-shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pointing-cursor--hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms ease;
+}
+
+.pointing-cursor:not(.pointing-cursor--hidden) {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms ease;
+}

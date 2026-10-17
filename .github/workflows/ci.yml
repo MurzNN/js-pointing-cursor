@@ -63,8 +63,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build playground
-        run: pnpm build:playground
+      - name: Build packages and playgrounds
+        run: pnpm build && pnpm build:playground
 
       - uses: actions/configure-pages@v5
 

@@ -7,19 +7,22 @@ import globals from 'globals'
 export default tseslint.config(
   {
     ignores: [
-      'dist/**',
+      '**/dist/**',
       'playground-dist/**',
       'node_modules/**',
-      'playground/public/r/**',
+      '**/public/r/**',
       'test-results/**',
       'playwright-report/**',
+      'src/**',
+      'playground/**',
+      'scripts/**',
     ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
   {
-    files: ['**/*.{ts,vue}'],
+    files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
       parser: vueParser,
       parserOptions: {
@@ -27,6 +30,7 @@ export default tseslint.config(
         ecmaVersion: 'latest',
         sourceType: 'module',
         extraFileExtensions: ['.vue'],
+        ecmaFeatures: { jsx: true },
       },
       globals: {
         ...globals.browser,
@@ -46,8 +50,7 @@ export default tseslint.config(
     },
   },
   {
-    // Bundled shape SVG via ?raw — not user-supplied HTML.
-    files: ['src/components/VueCursor/VueCursor.vue'],
+    files: ['packages/vue/src/VueCursor.vue'],
     rules: {
       'vue/no-v-html': 'off',
     },

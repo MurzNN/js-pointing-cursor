@@ -54,9 +54,9 @@ test.describe('vue-cursor playground', () => {
 
   test('can switch shapes', async ({ page }) => {
     await page.getByTestId('shape-select').getByLabel('hand', { exact: true }).check()
-    await expect(page.locator('.vue-cursor-shape--hand')).toBeVisible()
+    await expect(page.locator('.pointing-cursor-shape--hand')).toBeVisible()
     await page.getByTestId('shape-select').getByLabel('pointer', { exact: true }).check()
-    await expect(page.locator('.vue-cursor-shape--pointer')).toBeVisible()
+    await expect(page.locator('.pointing-cursor-shape--pointer')).toBeVisible()
   })
 
   test('follow mode can be toggled', async ({ page }) => {

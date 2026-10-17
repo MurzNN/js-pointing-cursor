@@ -1,0 +1,47 @@
+{
+  "name": "js-pointing-cursor",
+  "version": "0.1.0",
+  "description": "Framework-agnostic oversized pointing cursor: curved motion, follow mode, click burst, and SVG shapes.",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/js-pointing-cursor.cjs",
+  "module": "./dist/js-pointing-cursor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/js-pointing-cursor.js",
+      "require": "./dist/js-pointing-cursor.cjs"
+    },
+    "./core": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/js-pointing-cursor.js",
+      "require": "./dist/js-pointing-cursor.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.4",
+    "@types/node": "^22.18.0",
+    "jsdom": "^26.1.0",
+    "typescript": "~5.9.2",
+    "unplugin-dts": "^1.0.0-beta.6",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
+  },
+  "license": "MIT",
+  "homepage": "https://murznn.github.io/js-pointing-cursor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MurzNN/js-pointing-cursor.git",
+    "directory": "packages/core"
+  }
+}
