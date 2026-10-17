@@ -9,9 +9,10 @@ import {
   type CSSProperties,
 } from 'vue'
 import {
-  SHAPE_COMPONENTS,
   SHAPE_DEFAULT_ANGLES,
   SHAPE_HOTSPOTS,
+  SHAPE_STROKE_SCALE,
+  SHAPE_SVGS,
 } from '../../shapes'
 import {
   animateAlong,
@@ -193,7 +194,7 @@ function removeBurst(id: number) {
   bursts.value = bursts.value.filter((b) => b.id !== id)
 }
 
-const shapeComponent = computed(() => SHAPE_COMPONENTS[props.shape])
+const shapeMarkup = computed(() => SHAPE_SVGS[props.shape])
 
 const hotspot = computed(() => {
   const defaults = SHAPE_HOTSPOTS[props.shape]
@@ -201,6 +202,17 @@ const hotspot = computed(() => {
     x: props.hotspotX ?? defaults.x,
     y: props.hotspotY ?? defaults.y,
   }
+})
+
+const shapePaintStyle = computed((): CSSProperties => {
+  const base = Number(props.strokeWidth)
+  const width = Number.isFinite(base) ? base : 2
+  const scaled = width * SHAPE_STROKE_SCALE[props.shape]
+  return {
+    '--vue-cursor-fill': props.fill,
+    '--vue-cursor-stroke': props.stroke,
+    '--vue-cursor-stroke-width': String(scaled),
+  } as CSSProperties
 })
 
 /** Static layout styles — transforms are applied imperatively in paint(). */
@@ -592,13 +604,12 @@ defineExpose({
         :fill="fill"
         :stroke-width="strokeWidth"
       >
-        <component
-          :is="shapeComponent"
-          :stroke="stroke"
-          :fill="fill"
-          :stroke-width="strokeWidth"
-          :pressed="interaction.state.value !== 'idle'"
-          :button="interaction.button.value"
+        <div
+          class="vue-cursor__shape"
+          :data-pressed="interaction.state.value !== 'idle' ? 'true' : 'false'"
+          :data-button="interaction.button.value ?? undefined"
+          :style="shapePaintStyle"
+          v-html="shapeMarkup"
         />
       </slot>
     </div>
@@ -638,6 +649,19 @@ defineExpose({
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.vue-cursor__shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vue-cursor__shape :deep(.vue-cursor-shape) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 /* Opacity/visibility only — never transition transform on the paint root. */

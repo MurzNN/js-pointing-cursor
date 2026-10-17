@@ -1,17 +1,23 @@
-export { default as ArrowCursor } from './ArrowCursor.vue'
-export { default as PointerCursor } from './PointerCursor.vue'
-export { default as HandCursor } from './HandCursor.vue'
-
 import type { ShapeName } from '../types'
-import ArrowCursor from './ArrowCursor.vue'
-import PointerCursor from './PointerCursor.vue'
-import HandCursor from './HandCursor.vue'
-import type { Component } from 'vue'
+import arrowSvg from './arrow.svg?raw'
+import pointerSvg from './pointer.svg?raw'
+import handSvg from './hand.svg?raw'
 
-export const SHAPE_COMPONENTS: Record<ShapeName, Component> = {
-  arrow: ArrowCursor,
-  pointer: PointerCursor,
-  hand: HandCursor,
+/** Inlined SVG markup for each bundled shape. */
+export const SHAPE_SVGS: Record<ShapeName, string> = {
+  arrow: arrowSvg,
+  pointer: pointerSvg,
+  hand: handSvg,
+}
+
+/**
+ * Multiplier applied to `strokeWidth` so strokes look similar across viewBoxes.
+ * Hand uses a 256×256 box vs ~24 for arrow/pointer.
+ */
+export const SHAPE_STROKE_SCALE: Record<ShapeName, number> = {
+  arrow: 1,
+  pointer: 1,
+  hand: 256 / 24,
 }
 
 /**

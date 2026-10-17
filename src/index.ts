@@ -14,10 +14,8 @@ export type {
 } from './types'
 
 export {
-  ArrowCursor,
-  PointerCursor,
-  HandCursor,
-  SHAPE_COMPONENTS,
+  SHAPE_SVGS,
+  SHAPE_STROKE_SCALE,
   SHAPE_HOTSPOTS,
   SHAPE_DEFAULT_ANGLES,
 } from './shapes'

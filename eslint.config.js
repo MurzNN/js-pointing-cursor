@@ -45,4 +45,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Bundled shape SVG via ?raw — not user-supplied HTML.
+    files: ['src/components/VueCursor/VueCursor.vue'],
+    rules: {
+      'vue/no-v-html': 'off',
+    },
+  },
 )

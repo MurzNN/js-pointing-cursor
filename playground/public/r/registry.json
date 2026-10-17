@@ -26,15 +26,15 @@
           "type": "registry:ui"
         },
         {
-          "path": "src/shapes/ArrowCursor.vue",
+          "path": "src/shapes/arrow.svg",
           "type": "registry:ui"
         },
         {
-          "path": "src/shapes/PointerCursor.vue",
+          "path": "src/shapes/pointer.svg",
           "type": "registry:ui"
         },
         {
-          "path": "src/shapes/HandCursor.vue",
+          "path": "src/shapes/hand.svg",
           "type": "registry:ui"
         },
         {

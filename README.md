@@ -137,7 +137,7 @@ createApp(App).use(VueCursorPlugin).mount('#app')
 
 ### Slot
 
-Use the default slot to replace the bundled shape. The parent applies rotation and press scale; honor `data-pressed` if you want shape-level feedback.
+Use the default slot to replace the bundled shape. Bundled shapes are plain SVG files under `src/shapes/` (styled via CSS variables from `stroke` / `fill` / `strokeWidth`). The parent applies rotation and press scale; honor `data-pressed` if you want shape-level feedback.
 
 ## Development
 
