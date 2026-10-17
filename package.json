@@ -32,5 +32,10 @@
     "vue-eslint-parser": "^10.2.0"
   },
   "packageManager": "pnpm@10.15.0",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://murznn.github.io/js-pointing-cursor/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MurzNN/js-pointing-cursor.git"
+  }
 }

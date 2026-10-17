@@ -2,6 +2,8 @@
 
 Framework-agnostic oversized pointing cursor with **Vue** and **React** adapters.
 
+Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-pointing-cursor)
+
 - Curved, human-like `moveTo` (coords or CSS selector)
 - Follow mode, dangling aim, click press + radiating burst
 - Bundled arrow / pointer / hand SVG shapes
@@ -14,7 +16,7 @@ Framework-agnostic oversized pointing cursor with **Vue** and **React** adapters
 | [`vue-pointing-cursor`](packages/vue) | Vue 3 component |
 | [`react-pointing-cursor`](packages/react) | React component |
 
-## Install
+## Install (npm)
 
 ```bash
 pnpm add vue-pointing-cursor
@@ -27,6 +29,52 @@ Core alone (headless / custom UI):
 ```bash
 pnpm add js-pointing-cursor
 ```
+
+## Install via shadcn-vue (Vue)
+
+From the GitHub registry (copies sources into your project):
+
+```bash
+pnpm dlx shadcn-vue@latest add MurzNN/js-pointing-cursor/vue-pointing-cursor
+```
+
+Or point `components.json` at the hosted registry on GitHub Pages:
+
+```json
+{
+  "registries": {
+    "@pointing-cursor": "https://murznn.github.io/js-pointing-cursor/r/{name}.json"
+  }
+}
+```
+
+```bash
+pnpm dlx shadcn-vue@latest add @pointing-cursor/vue-pointing-cursor
+```
+
+## Install via shadcn (React)
+
+From the GitHub registry:
+
+```bash
+pnpm dlx shadcn@latest add MurzNN/js-pointing-cursor/react-pointing-cursor
+```
+
+Or with a hosted registry entry (same Pages `/r` base as Vue):
+
+```json
+{
+  "registries": {
+    "@pointing-cursor": "https://murznn.github.io/js-pointing-cursor/r/{name}.json"
+  }
+}
+```
+
+```bash
+pnpm dlx shadcn@latest add @pointing-cursor/react-pointing-cursor
+```
+
+> Prefer the npm packages when you want a dependency instead of vendored source. Registry installs are best for apps already using the shadcn / shadcn-vue workflow.
 
 ## Vue quick start
 

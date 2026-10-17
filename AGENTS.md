@@ -2,6 +2,9 @@
 
 Instructions for humans and coding agents working in this monorepo.
 
+- Repo: https://github.com/MurzNN/js-pointing-cursor
+- Pages: https://murznn.github.io/js-pointing-cursor/
+
 ## Source of truth
 
 - **`packages/core`** (`js-pointing-cursor`) — framework-agnostic controller, motion, shapes, click burst

@@ -213,9 +213,18 @@ export default function App() {
         </button>
       </div>
 
-      <p>
-        Install: <code>pnpm add react-pointing-cursor</code>
-      </p>
+      <section className="panel">
+        <h2>Install</h2>
+        <p>
+          NPM: <code>pnpm add react-pointing-cursor</code>
+        </p>
+        <p>
+          shadcn (GitHub):{' '}
+          <code>
+            pnpm dlx shadcn@latest add MurzNN/js-pointing-cursor/react-pointing-cursor
+          </code>
+        </p>
+      </section>
     </div>
   )
 }
