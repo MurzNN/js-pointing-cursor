@@ -12,7 +12,8 @@ Instructions for humans and coding agents working in this monorepo.
 - **`packages/react`** (`react-pointing-cursor`) — thin React adapter
 - **`apps/playground-vue`** / **`apps/playground-react`** — demos
 - Do **not** recreate a parallel tree under the old root `src/`
-- `registry/vue/registry.json` lists files for shadcn-vue; run `pnpm registry:build` after catalog changes
+- `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs
+- Root `registry.json` — generated for GitHub installs (`owner/repo/item`); run `pnpm registry:merge` (or `pnpm registry:build`) after catalog changes and commit the result
 
 ## Architecture
 
