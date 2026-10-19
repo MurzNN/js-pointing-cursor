@@ -13,7 +13,7 @@ export type {
   MoveTarget,
   CursorController,
   CursorControllerConfig,
-} from 'js-pointing-cursor'
+} from './core'
 
 export {
   SHAPE_SVGS,
@@ -34,7 +34,7 @@ export {
   createCursorInteraction,
   dispatchRealClick,
   headingToRotation,
-} from 'js-pointing-cursor'
+} from './core'
 
 export { VuePointingCursor }
 export { VuePointingCursor as default }

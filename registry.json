@@ -10,15 +10,14 @@
       "description": "An oversized Vue 3 cursor with curved motion, follow mode, replaceable SVG shapes, and click animation.",
       "author": "Alexey Murz Korepov",
       "dependencies": [
-        "vue@^3.5.0",
-        "js-pointing-cursor"
+        "vue@^3.5.0"
       ],
       "registryDependencies": [],
       "categories": [
         "cursor",
         "animation"
       ],
-      "docs": "Installs into components/ui/pointing-cursor (plus the js-pointing-cursor npm dependency). Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
+      "docs": "Installs into components/ui/pointing-cursor. Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
       "files": [
         {
           "path": "packages/vue/src/pointing-cursor/VuePointingCursor.vue",
@@ -26,6 +25,58 @@
         },
         {
           "path": "packages/vue/src/pointing-cursor/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/core.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/env.d.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/types.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/motion.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/motionStyle.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/interaction.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/resolveTarget.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/clickBurst.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/createCursorController.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/shapes/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/shapes/arrow.svg",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/shapes/pointer.svg",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/vue/src/pointing-cursor/shapes/hand.svg",
           "type": "registry:ui"
         }
       ]
@@ -38,14 +89,13 @@
       "author": "Alexey Murz Korepov",
       "dependencies": [
         "react",
-        "react-dom",
-        "js-pointing-cursor"
+        "react-dom"
       ],
       "categories": [
         "cursor",
         "animation"
       ],
-      "docs": "Installs into components/ui/pointing-cursor (plus the js-pointing-cursor npm dependency). Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/react/",
+      "docs": "Installs into components/ui/pointing-cursor. Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/react/",
       "files": [
         {
           "path": "packages/react/src/pointing-cursor/ReactPointingCursor.tsx",
@@ -57,6 +107,58 @@
         },
         {
           "path": "packages/react/src/pointing-cursor/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/core.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/env.d.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/types.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/motion.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/motionStyle.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/interaction.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/resolveTarget.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/clickBurst.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/createCursorController.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/shapes/index.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/shapes/arrow.svg",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/shapes/pointer.svg",
+          "type": "registry:ui"
+        },
+        {
+          "path": "packages/react/src/pointing-cursor/shapes/hand.svg",
           "type": "registry:ui"
         }
       ]

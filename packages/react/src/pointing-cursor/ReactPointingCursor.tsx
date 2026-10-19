@@ -9,16 +9,16 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
-import {
-  createCursorController,
-  type ClickOptions,
-  type CursorController,
-  type MotionStyle,
-  type MouseButton,
-  type MoveToOptions,
-  type Point,
-  type ShapeName,
-} from 'js-pointing-cursor'
+import { createCursorController } from './core'
+import type {
+  ClickOptions,
+  CursorController,
+  MotionStyle,
+  MouseButton,
+  MoveToOptions,
+  Point,
+  ShapeName,
+} from './core'
 
 export interface ReactPointingCursorProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {

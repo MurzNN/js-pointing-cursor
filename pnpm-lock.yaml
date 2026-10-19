@@ -114,10 +114,6 @@ importers:
         version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(jsdom@26.1.0)(stylus@0.57.0)
 
   packages/react:
-    dependencies:
-      js-pointing-cursor:
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       '@microsoft/api-extractor':
         specifier: ^7.59.4
@@ -160,10 +156,6 @@ importers:
         version: 3.2.7(@types/node@22.20.5)(jiti@2.7.0)(jsdom@26.1.0)(stylus@0.57.0)
 
   packages/vue:
-    dependencies:
-      js-pointing-cursor:
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       '@microsoft/api-extractor':
         specifier: ^7.59.4

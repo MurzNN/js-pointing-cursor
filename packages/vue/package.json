@@ -21,9 +21,6 @@
   "peerDependencies": {
     "vue": "^3.5.0"
   },
-  "dependencies": {
-    "js-pointing-cursor": "workspace:*"
-  },
   "scripts": {
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",

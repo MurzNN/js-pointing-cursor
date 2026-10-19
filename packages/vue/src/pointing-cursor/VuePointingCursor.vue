@@ -7,15 +7,15 @@ import {
   watch,
   type CSSProperties,
 } from 'vue'
-import {
-  createCursorController,
-  type ClickOptions,
-  type MotionStyle,
-  type MouseButton,
-  type MoveToOptions,
-  type Point,
-  type ShapeName,
-} from 'js-pointing-cursor'
+import { createCursorController } from './core'
+import type {
+  ClickOptions,
+  MotionStyle,
+  MouseButton,
+  MoveToOptions,
+  Point,
+  ShapeName,
+} from './core'
 
 defineOptions({ name: 'VuePointingCursor', inheritAttrs: false })
 

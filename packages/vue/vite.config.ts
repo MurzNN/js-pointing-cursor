@@ -13,7 +13,6 @@ export default defineConfig({
       include: ['src'],
       outDirs: ['dist'],
       insertTypesEntry: true,
-      // Keep `js-pointing-cursor` imports in .d.ts (runtime core is bundled).
       bundleTypes: false,
     }),
   ],
@@ -26,7 +25,7 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      // Bundle js-pointing-cursor so consumers only need vue-pointing-cursor + vue.
+      // Core sources live under src/pointing-cursor (synced from packages/core).
       external: ['vue'],
       output: {
         exports: 'named',
