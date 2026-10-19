@@ -14,6 +14,7 @@ Instructions for humans and coding agents working in this monorepo.
 - Do **not** recreate a parallel tree under the old root `src/`
 - `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs (paths point at `packages/*/src/pointing-cursor/`)
 - Adapter `pointing-cursor/` folders vendor a copy of core (relative imports) for shadcn installs — edit `packages/core`, then run `pnpm registry:sync` and commit
+- Shape SVGs live as real `.svg` under `packages/core/src/shapes/`; sync copies them flat into adapters as `*.svg.txt` (shadcn-vue only skips transforms for `.md`/`.mdx`/`.txt`, so raw `.svg` aborts install)
 - Root `registry.json` — generated for GitHub installs (`owner/repo/item`); run `pnpm registry:merge` (or `pnpm registry:build`) after catalog/core changes and commit the result
 
 ## Architecture
