@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  ReactPointingCursor,
+  PointingCursor,
   type MotionStyle,
-  type ReactPointingCursorHandle,
+  type PointingCursorHandle,
   type ShapeName,
 } from 'react-pointing-cursor'
 
@@ -10,7 +10,7 @@ const shapeOptions: ShapeName[] = ['arrow', 'pointer', 'hand']
 const motionStyleOptions: MotionStyle[] = ['standard', 'dangling']
 
 export default function App() {
-  const cursorRef = useRef<ReactPointingCursorHandle>(null)
+  const cursorRef = useRef<PointingCursorHandle>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(true)
   const [followMouse, setFollowMouse] = useState(false)
@@ -65,7 +65,7 @@ export default function App() {
 
   return (
     <div className="page">
-      <ReactPointingCursor
+      <PointingCursor
         ref={cursorRef}
         data-testid="react-cursor"
         visible={visible}

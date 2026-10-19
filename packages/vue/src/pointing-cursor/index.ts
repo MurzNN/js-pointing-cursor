@@ -1,5 +1,5 @@
 import type { App, Plugin } from 'vue'
-import VuePointingCursor from './VuePointingCursor.vue'
+import PointingCursor from './PointingCursor.vue'
 
 export type {
   ShapeName,
@@ -17,7 +17,6 @@ export type {
 
 export {
   SHAPE_SVGS,
-  SHAPE_STROKE_SCALE,
   SHAPE_HOTSPOTS,
   SHAPE_DEFAULT_ANGLES,
   createCursorController,
@@ -36,15 +35,15 @@ export {
   headingToRotation,
 } from './core'
 
-export { VuePointingCursor }
-export { VuePointingCursor as default }
+export { PointingCursor }
+export { PointingCursor as default }
 
-export interface VuePointingCursorPluginOptions {
+export interface PointingCursorPluginOptions {
   name?: string
 }
 
-export const VuePointingCursorPlugin: Plugin = {
-  install(app: App, options: VuePointingCursorPluginOptions = {}) {
-    app.component(options.name ?? 'VuePointingCursor', VuePointingCursor)
+export const PointingCursorPlugin: Plugin = {
+  install(app: App, options: PointingCursorPluginOptions = {}) {
+    app.component(options.name ?? 'PointingCursor', PointingCursor)
   },
 }

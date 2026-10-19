@@ -1,8 +1,8 @@
 export {
-  VuePointingCursor,
-  VuePointingCursor as default,
-  VuePointingCursorPlugin,
-  type VuePointingCursorPluginOptions,
+  PointingCursor,
+  PointingCursor as default,
+  PointingCursorPlugin,
+  type PointingCursorPluginOptions,
 } from './pointing-cursor'
 
 export type {
@@ -21,7 +21,6 @@ export type {
 
 export {
   SHAPE_SVGS,
-  SHAPE_STROKE_SCALE,
   SHAPE_HOTSPOTS,
   SHAPE_DEFAULT_ANGLES,
   createCursorController,

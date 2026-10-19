@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { createRef } from 'react'
 import { render, act } from '@testing-library/react'
-import { ReactPointingCursor, type ReactPointingCursorHandle } from '../src'
+import { PointingCursor, type PointingCursorHandle } from '../src'
 
-describe('ReactPointingCursor', () => {
+describe('PointingCursor', () => {
   it('renders the default arrow shape', () => {
     const { container, unmount } = render(
-      <ReactPointingCursor x={100} y={100} />,
+      <PointingCursor x={100} y={100} />,
     )
     expect(container.querySelector('.pointing-cursor')).toBeTruthy()
     expect(
@@ -16,8 +16,8 @@ describe('ReactPointingCursor', () => {
   })
 
   it('exposes moveTo and getPosition', async () => {
-    const ref = createRef<ReactPointingCursorHandle>()
-    const { unmount } = render(<ReactPointingCursor ref={ref} x={0} y={0} />)
+    const ref = createRef<PointingCursorHandle>()
+    const { unmount } = render(<PointingCursor ref={ref} x={0} y={0} />)
     await act(async () => {
       await ref.current?.moveTo(200, 150, { animate: false })
     })

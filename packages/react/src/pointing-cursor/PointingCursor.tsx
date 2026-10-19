@@ -20,13 +20,12 @@ import type {
   ShapeName,
 } from './core'
 
-export interface ReactPointingCursorProps
+export interface PointingCursorProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   size?: string
   shape?: ShapeName
   stroke?: string
   fill?: string
-  strokeWidth?: number | string
   visible?: boolean
   followMouse?: boolean
   hideNativeCursor?: boolean
@@ -57,11 +56,10 @@ export interface ReactPointingCursorProps
     button: MouseButton | null
     stroke: string
     fill: string
-    strokeWidth: number | string
   }) => ReactNode
 }
 
-export interface ReactPointingCursorHandle {
+export interface PointingCursorHandle {
   show(): void
   hide(): void
   moveTo(
@@ -82,14 +80,13 @@ export interface ReactPointingCursorHandle {
   setMotionStyle(style: MotionStyle): void
 }
 
-export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPointingCursorProps>(
-  function ReactPointingCursor(props, ref) {
+export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorProps>(
+  function PointingCursor(props, ref) {
     const {
       size = '3em',
       shape = 'arrow',
-      stroke = '#111111',
+      stroke = '#000000',
       fill = '#ffffff',
-      strokeWidth = 2,
       visible = true,
       followMouse = false,
       hideNativeCursor = false,
@@ -156,7 +153,6 @@ export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPo
           shape,
           stroke,
           fill,
-          strokeWidth,
           visible,
           followMouse,
           hideNativeCursor,
@@ -200,7 +196,6 @@ export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPo
         shape,
         stroke,
         fill,
-        strokeWidth,
         visible,
         followMouse,
         hideNativeCursor,
@@ -231,7 +226,6 @@ export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPo
       shape,
       stroke,
       fill,
-      strokeWidth,
       visible,
       followMouse,
       hideNativeCursor,
@@ -308,7 +302,6 @@ export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPo
               button,
               stroke,
               fill,
-              strokeWidth,
             })
           ) : (
             <div
@@ -325,4 +318,4 @@ export const ReactPointingCursor = forwardRef<ReactPointingCursorHandle, ReactPo
   },
 )
 
-ReactPointingCursor.displayName = 'ReactPointingCursor'
+PointingCursor.displayName = 'PointingCursor'

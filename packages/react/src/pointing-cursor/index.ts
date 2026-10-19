@@ -16,7 +16,6 @@ export type {
 
 export {
   SHAPE_SVGS,
-  SHAPE_STROKE_SCALE,
   SHAPE_HOTSPOTS,
   SHAPE_DEFAULT_ANGLES,
   createCursorController,
@@ -35,9 +34,9 @@ export {
   headingToRotation,
 } from './core'
 
-export { ReactPointingCursor } from './ReactPointingCursor'
+export { PointingCursor } from './PointingCursor'
 export type {
-  ReactPointingCursorProps,
-  ReactPointingCursorHandle,
-} from './ReactPointingCursor'
-export { ReactPointingCursor as default } from './ReactPointingCursor'
+  PointingCursorProps,
+  PointingCursorHandle,
+} from './PointingCursor'
+export { PointingCursor as default } from './PointingCursor'

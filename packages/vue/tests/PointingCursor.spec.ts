@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { VuePointingCursor } from '../src'
+import { PointingCursor } from '../src'
 
-describe('VuePointingCursor', () => {
+describe('PointingCursor', () => {
   it('renders the default arrow shape', () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 100, y: 100 },
       attachTo: document.body,
     })
@@ -14,7 +14,7 @@ describe('VuePointingCursor', () => {
   })
 
   it('forwards fallthrough attrs to the cursor root (multi-root template)', () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 100, y: 100 },
       attrs: { 'data-testid': 'vue-cursor' },
       attachTo: document.body,
@@ -26,7 +26,7 @@ describe('VuePointingCursor', () => {
   })
 
   it('exposes show/hide and toggles visibility class', async () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 10, y: 10, visible: true },
       attachTo: document.body,
     })
@@ -44,7 +44,7 @@ describe('VuePointingCursor', () => {
   })
 
   it('moveTo jumps without animation when animate is false', async () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 0, y: 0 },
       attachTo: document.body,
     })
@@ -65,7 +65,7 @@ describe('VuePointingCursor', () => {
   })
 
   it('emits move only at boundaries by default during moveTo', async () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 0, y: 0, motionStyle: 'standard' },
       attachTo: document.body,
     })
@@ -121,7 +121,7 @@ describe('VuePointingCursor', () => {
       toJSON: () => ({}),
     })
 
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 0, y: 0 },
       attachTo: document.body,
     })
@@ -136,7 +136,7 @@ describe('VuePointingCursor', () => {
   })
 
   it('switches bundled shapes', async () => {
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { shape: 'hand', x: 1, y: 1 },
       attachTo: document.body,
     })
@@ -148,7 +148,7 @@ describe('VuePointingCursor', () => {
 
   it('exposes click and clickAt', async () => {
     vi.useFakeTimers()
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: { x: 10, y: 10, clickAnimationDuration: 50 },
       attachTo: document.body,
     })
@@ -171,7 +171,7 @@ describe('VuePointingCursor', () => {
 
   it('spawns a green burst on left click and red on right', async () => {
     vi.useFakeTimers()
-    const wrapper = mount(VuePointingCursor, {
+    const wrapper = mount(PointingCursor, {
       props: {
         x: 40,
         y: 50,

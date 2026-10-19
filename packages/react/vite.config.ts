@@ -16,7 +16,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: 'ReactPointingCursor',
+      name: 'PointingCursor',
       fileName: (format) =>
         format === 'es'
           ? 'react-pointing-cursor.js'

@@ -27,9 +27,9 @@ test.describe('vue-cursor playground', () => {
     const markerBox = await marker.boundingBox()
     expect(markerBox).toBeTruthy()
 
-    // Cursor hotspot should land near the marker center (arrow hotspot ~0.14, 0.10)
-    const cx = after!.x + after!.width * 0.14
-    const cy = after!.y + after!.height * 0.1
+    // Cursor hotspot should land near the marker center (arrow hotspot ~0.33, 0.17)
+    const cx = after!.x + after!.width * 0.33
+    const cy = after!.y + after!.height * 0.17
     const mx = markerBox!.x + markerBox!.width / 2
     const my = markerBox!.y + markerBox!.height / 2
     expect(Math.hypot(cx - mx, cy - my)).toBeLessThan(40)
@@ -45,8 +45,8 @@ test.describe('vue-cursor playground', () => {
     const b = await button.boundingBox()
     expect(c && b).toBeTruthy()
 
-    const cx = c!.x + c!.width * 0.14
-    const cy = c!.y + c!.height * 0.1
+    const cx = c!.x + c!.width * 0.33
+    const cy = c!.y + c!.height * 0.17
     const bx = b!.x + b!.width / 2
     const by = b!.y + b!.height / 2
     expect(Math.hypot(cx - bx, cy - by)).toBeLessThan(45)

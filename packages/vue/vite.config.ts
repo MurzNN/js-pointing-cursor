@@ -19,7 +19,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: 'VuePointingCursor',
+      name: 'PointingCursor',
       fileName: (format) =>
         format === 'es' ? 'vue-pointing-cursor.js' : 'vue-pointing-cursor.cjs',
       formats: ['es', 'cjs'],

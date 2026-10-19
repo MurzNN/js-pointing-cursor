@@ -12,10 +12,10 @@
       "dependencies": ["vue@^3.5.0"],
       "registryDependencies": [],
       "categories": ["cursor", "animation"],
-      "docs": "Installs into components/ui/pointing-cursor. Shape assets use the .svg.txt suffix so shadcn-vue skips its JS transformer (raw .svg crashes install). Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
+      "docs": "Installs into components/ui/pointing-cursor. Shape SVG markup is inlined in shapes.ts. Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
       "files": [
         {
-          "path": "packages/vue/src/pointing-cursor/VuePointingCursor.vue",
+          "path": "packages/vue/src/pointing-cursor/PointingCursor.vue",
           "type": "registry:ui"
         },
         {
@@ -24,10 +24,6 @@
         },
         {
           "path": "packages/vue/src/pointing-cursor/core.ts",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/env.d.ts",
           "type": "registry:ui"
         },
         {
@@ -60,18 +56,6 @@
         },
         {
           "path": "packages/vue/src/pointing-cursor/shapes.ts",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/arrow.svg.txt",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/pointer.svg.txt",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/hand.svg.txt",
           "type": "registry:ui"
         }
       ]

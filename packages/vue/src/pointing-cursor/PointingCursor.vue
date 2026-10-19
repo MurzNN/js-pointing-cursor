@@ -17,7 +17,7 @@ import type {
   ShapeName,
 } from './core'
 
-defineOptions({ name: 'VuePointingCursor', inheritAttrs: false })
+defineOptions({ name: 'PointingCursor', inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{
@@ -25,7 +25,6 @@ const props = withDefaults(
     shape?: ShapeName
     stroke?: string
     fill?: string
-    strokeWidth?: number | string
     visible?: boolean
     followMouse?: boolean
     hideNativeCursor?: boolean
@@ -52,9 +51,8 @@ const props = withDefaults(
   {
     size: '3em',
     shape: 'arrow',
-    stroke: '#111111',
+    stroke: '#000000',
     fill: '#ffffff',
-    strokeWidth: 2,
     visible: true,
     followMouse: false,
     hideNativeCursor: false,
@@ -98,7 +96,6 @@ function configFromProps() {
     shape: props.shape,
     stroke: props.stroke,
     fill: props.fill,
-    strokeWidth: props.strokeWidth,
     visible: props.visible,
     followMouse: props.followMouse,
     hideNativeCursor: props.hideNativeCursor,
@@ -218,7 +215,6 @@ defineExpose({
         :button="button"
         :stroke="stroke"
         :fill="fill"
-        :stroke-width="strokeWidth"
       >
         <div
           class="pointing-cursor__shape"

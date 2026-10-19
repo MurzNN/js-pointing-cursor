@@ -13,8 +13,8 @@ Instructions for humans and coding agents working in this monorepo.
 - **`apps/playground-vue`** / **`apps/playground-react`** — demos
 - Do **not** recreate a parallel tree under the old root `src/`
 - `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs (paths point at `packages/*/src/pointing-cursor/`)
-- Adapter `pointing-cursor/` folders vendor a copy of core (relative imports) for shadcn installs — edit `packages/core`, then run `pnpm registry:sync` and commit
-- Shape SVGs live as real `.svg` under `packages/core/src/shapes/`; sync copies them flat into adapters as `*.svg.txt` (shadcn-vue only skips transforms for `.md`/`.mdx`/`.txt`, so raw `.svg` aborts install)
+- Adapter `pointing-cursor/` folders vendor a copy of core (relative imports) for shadcn installs — edit `packages/core`, then run `pnpm shapes:sync` (alias: `pnpm registry:sync`) and commit
+- Shape SVGs live as real `.svg` under `packages/core/src/shapes/`; sync **inlines** them into each adapter’s generated `shapes.ts` (no separate `.svg` / `.svg.txt` assets — avoids shadcn-vue choking on raw SVG)
 - Root `registry.json` — generated for GitHub installs (`owner/repo/item`); run `pnpm registry:merge` (or `pnpm registry:build`) after catalog/core changes and commit the result
 
 ## Architecture
@@ -23,7 +23,7 @@ Instructions for humans and coding agents working in this monorepo.
 createCursorController (core)
   → imperative paint on root/inner elements
   → mountClickBurst on document.body
-VuePointingCursor / ReactPointingCursor → props/lifecycle/refs only
+PointingCursor (Vue / React shells) → props/lifecycle/refs only
 ```
 
 | Concern | Module |
@@ -34,8 +34,8 @@ VuePointingCursor / ReactPointingCursor → props/lifecycle/refs only
 | Coords / selector → point | `packages/core/src/resolveTarget.ts` |
 | Click burst DOM | `packages/core/src/clickBurst.ts` |
 | Orchestration | `packages/core/src/createCursorController.ts` |
-| Vue shell | `packages/vue/src/pointing-cursor/VuePointingCursor.vue` |
-| React shell | `packages/react/src/pointing-cursor/ReactPointingCursor.tsx` |
+| Vue shell | `packages/vue/src/pointing-cursor/PointingCursor.vue` |
+| React shell | `packages/react/src/pointing-cursor/PointingCursor.tsx` |
 
 ## Rules
 

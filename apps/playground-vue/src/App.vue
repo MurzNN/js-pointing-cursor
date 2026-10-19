@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import {
-  VuePointingCursor,
+  PointingCursor,
   type MotionStyle,
   type ShapeName,
 } from 'vue-pointing-cursor'
 
-const cursorRef = ref<InstanceType<typeof VuePointingCursor> | null>(null)
+const cursorRef = ref<InstanceType<typeof PointingCursor> | null>(null)
 
 const visible = ref(true)
 const followMouse = ref(false)
 const hideNativeCursor = ref(true)
 const shape = ref<ShapeName>('arrow')
-const stroke = ref('#111111')
+const stroke = ref('#000000')
 const fill = ref('#ffffff')
-const strokeWidth = ref(2)
 const size = ref('3em')
 const motionStyle = ref<MotionStyle>('dangling')
 const clickBurst = ref(true)
@@ -125,7 +124,7 @@ async function rightClickDemo() {
       </p>
     </header>
 
-    <VuePointingCursor
+    <PointingCursor
       ref="cursorRef"
       :visible="visible"
       :follow-mouse="followMouse"
@@ -133,7 +132,6 @@ async function rightClickDemo() {
       :shape="shape"
       :stroke="stroke"
       :fill="fill"
-      :stroke-width="strokeWidth"
       :size="size"
       :motion-style="motionStyle"
       :click-burst="clickBurst"
@@ -193,17 +191,6 @@ async function rightClickDemo() {
           <label>
             Fill
             <input v-model="fill" type="color" />
-          </label>
-          <label>
-            Stroke width
-            <input
-              v-model.number="strokeWidth"
-              type="range"
-              min="0.5"
-              max="2"
-              step="0.5"
-            />
-            {{ strokeWidth }}
           </label>
         </div>
 

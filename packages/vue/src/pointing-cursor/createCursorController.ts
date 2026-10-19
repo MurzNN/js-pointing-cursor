@@ -12,7 +12,6 @@ import { mountClickBurst } from './clickBurst'
 import {
   SHAPE_DEFAULT_ANGLES,
   SHAPE_HOTSPOTS,
-  SHAPE_STROKE_SCALE,
   SHAPE_SVGS,
 } from './shapes'
 import type {
@@ -47,7 +46,6 @@ export interface CursorControllerConfig {
   shape: ShapeName
   stroke: string
   fill: string
-  strokeWidth: number | string
   visible: boolean
   followMouse: boolean
   hideNativeCursor: boolean
@@ -75,9 +73,8 @@ export interface CursorControllerConfig {
 export const DEFAULT_CURSOR_CONFIG: CursorControllerConfig = {
   size: '3em',
   shape: 'arrow',
-  stroke: '#111111',
+  stroke: '#000000',
   fill: '#ffffff',
-  strokeWidth: 2,
   visible: true,
   followMouse: false,
   hideNativeCursor: false,
@@ -573,16 +570,10 @@ export function createCursorController(
     rightClick: (o) => click({ ...o, button: 'right' }),
     setMotionStyle,
     getShapeMarkup: () => SHAPE_SVGS[config.shape],
-    getShapePaintStyle: () => {
-      const base = Number(config.strokeWidth)
-      const width = Number.isFinite(base) ? base : 2
-      const scaled = width * SHAPE_STROKE_SCALE[config.shape]
-      return {
-        '--pointing-cursor-fill': config.fill,
-        '--pointing-cursor-stroke': config.stroke,
-        '--pointing-cursor-stroke-width': String(scaled),
-      }
-    },
+    getShapePaintStyle: () => ({
+      '--pointing-cursor-fill': config.fill,
+      '--pointing-cursor-stroke': config.stroke,
+    }),
     getInteraction: () => ({
       pressed: interaction.getState() !== 'idle',
       button: interaction.getButton(),
