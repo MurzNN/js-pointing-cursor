@@ -32,10 +32,6 @@
           "type": "registry:ui"
         },
         {
-          "path": "packages/vue/src/pointing-cursor/env.d.ts",
-          "type": "registry:ui"
-        },
-        {
           "path": "packages/vue/src/pointing-cursor/types.ts",
           "type": "registry:ui"
         },
@@ -64,19 +60,7 @@
           "type": "registry:ui"
         },
         {
-          "path": "packages/vue/src/pointing-cursor/shapes/index.ts",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/shapes/arrow.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/shapes/pointer.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/vue/src/pointing-cursor/shapes/hand.svg",
+          "path": "packages/vue/src/pointing-cursor/shapes.ts",
           "type": "registry:ui"
         }
       ]
@@ -114,10 +98,6 @@
           "type": "registry:ui"
         },
         {
-          "path": "packages/react/src/pointing-cursor/env.d.ts",
-          "type": "registry:ui"
-        },
-        {
           "path": "packages/react/src/pointing-cursor/types.ts",
           "type": "registry:ui"
         },
@@ -146,19 +126,7 @@
           "type": "registry:ui"
         },
         {
-          "path": "packages/react/src/pointing-cursor/shapes/index.ts",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/react/src/pointing-cursor/shapes/arrow.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/react/src/pointing-cursor/shapes/pointer.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/react/src/pointing-cursor/shapes/hand.svg",
+          "path": "packages/react/src/pointing-cursor/shapes.ts",
           "type": "registry:ui"
         }
       ]

@@ -21,8 +21,7 @@ const CORE_ENTRIES = [
   'resolveTarget.ts',
   'clickBurst.ts',
   'createCursorController.ts',
-  'env.d.ts',
-  'shapes',
+  'shapes.ts',
 ]
 
 const CORE_BARREL = `export type {
@@ -187,6 +186,10 @@ export { ReactPointingCursor as default } from './ReactPointingCursor'
 
 for (const adapter of adapters) {
   mkdirSync(adapter.dir, { recursive: true })
+
+  // Drop legacy nested shapes/ + svg?raw ambient from older syncs.
+  rmSync(join(adapter.dir, 'shapes'), { recursive: true, force: true })
+  rmSync(join(adapter.dir, 'env.d.ts'), { force: true })
 
   for (const name of CORE_ENTRIES) {
     const to = join(adapter.dir, name)
