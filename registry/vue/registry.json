@@ -9,65 +9,17 @@
       "title": "Vue Pointing Cursor",
       "description": "An oversized Vue 3 cursor with curved motion, follow mode, replaceable SVG shapes, and click animation.",
       "author": "Alexey Murz Korepov",
-      "dependencies": ["vue@^3.5.0"],
+      "dependencies": ["vue@^3.5.0", "js-pointing-cursor"],
       "registryDependencies": [],
       "categories": ["cursor", "animation"],
-      "docs": "Import from vue-pointing-cursor or copy via shadcn-vue. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
+      "docs": "Installs into components/ui/pointing-cursor (plus the js-pointing-cursor npm dependency). Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/vue/",
       "files": [
         {
-          "path": "packages/vue/src/VuePointingCursor.vue",
+          "path": "packages/vue/src/pointing-cursor/VuePointingCursor.vue",
           "type": "registry:ui"
         },
         {
-          "path": "packages/vue/src/index.ts",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/core/src/index.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/types.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/motion.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/motionStyle.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/interaction.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/resolveTarget.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/clickBurst.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/createCursorController.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/shapes/index.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "packages/core/src/shapes/arrow.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/core/src/shapes/pointer.svg",
-          "type": "registry:ui"
-        },
-        {
-          "path": "packages/core/src/shapes/hand.svg",
+          "path": "packages/vue/src/pointing-cursor/index.ts",
           "type": "registry:ui"
         }
       ]

@@ -1,4 +1,9 @@
-import './styles.css'
+export {
+  ReactPointingCursor,
+  ReactPointingCursor as default,
+  type ReactPointingCursorProps,
+  type ReactPointingCursorHandle,
+} from './pointing-cursor'
 
 export type {
   ShapeName,
@@ -12,7 +17,7 @@ export type {
   MoveTarget,
   CursorController,
   CursorControllerConfig,
-} from 'js-pointing-cursor'
+} from './pointing-cursor'
 
 export {
   SHAPE_SVGS,
@@ -33,8 +38,4 @@ export {
   createCursorInteraction,
   dispatchRealClick,
   headingToRotation,
-} from 'js-pointing-cursor'
-
-export { ReactPointingCursor } from './ReactPointingCursor'
-export type { ReactPointingCursorProps, ReactPointingCursorHandle } from './ReactPointingCursor'
-export { ReactPointingCursor as default } from './ReactPointingCursor'
+} from './pointing-cursor'

@@ -1,5 +1,9 @@
-import type { App, Plugin } from 'vue'
-import VuePointingCursor from './VuePointingCursor.vue'
+export {
+  VuePointingCursor,
+  VuePointingCursor as default,
+  VuePointingCursorPlugin,
+  type VuePointingCursorPluginOptions,
+} from './pointing-cursor'
 
 export type {
   ShapeName,
@@ -13,7 +17,7 @@ export type {
   MoveTarget,
   CursorController,
   CursorControllerConfig,
-} from 'js-pointing-cursor'
+} from './pointing-cursor'
 
 export {
   SHAPE_SVGS,
@@ -34,17 +38,4 @@ export {
   createCursorInteraction,
   dispatchRealClick,
   headingToRotation,
-} from 'js-pointing-cursor'
-
-export { VuePointingCursor }
-export { VuePointingCursor as default }
-
-export interface VuePointingCursorPluginOptions {
-  name?: string
-}
-
-export const VuePointingCursorPlugin: Plugin = {
-  install(app: App, options: VuePointingCursorPluginOptions = {}) {
-    app.component(options.name ?? 'VuePointingCursor', VuePointingCursor)
-  },
-}
+} from './pointing-cursor'

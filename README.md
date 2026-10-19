@@ -32,10 +32,14 @@ pnpm add js-pointing-cursor
 
 ## Install via shadcn-vue (Vue)
 
-From the GitHub registry (copies sources into your project):
+From the GitHub registry (copies the Vue adapter into `components/ui/pointing-cursor` and installs `js-pointing-cursor`):
 
 ```bash
 pnpm dlx shadcn-vue@latest add MurzNN/js-pointing-cursor/vue-pointing-cursor
+```
+
+```ts
+import { VuePointingCursor } from '@/components/ui/pointing-cursor'
 ```
 
 Or point `components.json` at the hosted registry on GitHub Pages:
@@ -54,10 +58,14 @@ pnpm dlx shadcn-vue@latest add @pointing-cursor/vue-pointing-cursor
 
 ## Install via shadcn (React)
 
-From the GitHub registry:
+From the GitHub registry (copies the React adapter into `components/ui/pointing-cursor` and installs `js-pointing-cursor`):
 
 ```bash
 pnpm dlx shadcn@latest add MurzNN/js-pointing-cursor/react-pointing-cursor
+```
+
+```ts
+import { ReactPointingCursor } from '@/components/ui/pointing-cursor'
 ```
 
 Or with a hosted registry entry (same Pages `/r` base as Vue):

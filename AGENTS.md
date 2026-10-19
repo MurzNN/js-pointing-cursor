@@ -12,7 +12,7 @@ Instructions for humans and coding agents working in this monorepo.
 - **`packages/react`** (`react-pointing-cursor`) — thin React adapter
 - **`apps/playground-vue`** / **`apps/playground-react`** — demos
 - Do **not** recreate a parallel tree under the old root `src/`
-- `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs
+- `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs (paths point at package sources under `src/pointing-cursor/`)
 - Root `registry.json` — generated for GitHub installs (`owner/repo/item`); run `pnpm registry:merge` (or `pnpm registry:build`) after catalog changes and commit the result
 
 ## Architecture
@@ -32,8 +32,8 @@ VuePointingCursor / ReactPointingCursor → props/lifecycle/refs only
 | Coords / selector → point | `packages/core/src/resolveTarget.ts` |
 | Click burst DOM | `packages/core/src/clickBurst.ts` |
 | Orchestration | `packages/core/src/createCursorController.ts` |
-| Vue shell | `packages/vue/src/VuePointingCursor.vue` |
-| React shell | `packages/react/src/ReactPointingCursor.tsx` |
+| Vue shell | `packages/vue/src/pointing-cursor/VuePointingCursor.vue` |
+| React shell | `packages/react/src/pointing-cursor/ReactPointingCursor.tsx` |
 
 ## Rules
 

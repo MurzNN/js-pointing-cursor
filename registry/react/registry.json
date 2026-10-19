@@ -11,18 +11,18 @@
       "author": "Alexey Murz Korepov",
       "dependencies": ["react", "react-dom", "js-pointing-cursor"],
       "categories": ["cursor", "animation"],
-      "docs": "Install react-pointing-cursor from npm, or copy sources from this monorepo. Demo: https://murznn.github.io/js-pointing-cursor/react/",
+      "docs": "Installs into components/ui/pointing-cursor (plus the js-pointing-cursor npm dependency). Import from @/components/ui/pointing-cursor. Demo: https://murznn.github.io/js-pointing-cursor/react/",
       "files": [
         {
-          "path": "packages/react/src/ReactPointingCursor.tsx",
+          "path": "packages/react/src/pointing-cursor/ReactPointingCursor.tsx",
           "type": "registry:ui"
         },
         {
-          "path": "packages/react/src/styles.css",
+          "path": "packages/react/src/pointing-cursor/styles.css",
           "type": "registry:ui"
         },
         {
-          "path": "packages/react/src/index.ts",
+          "path": "packages/react/src/pointing-cursor/index.ts",
           "type": "registry:ui"
         }
       ]
