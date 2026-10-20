@@ -1,6 +1,6 @@
 packages:
   - 'packages/*'
-  - 'apps/*'
+  - 'demo/*'
 allowBuilds:
   esbuild: true
 onlyBuiltDependencies:

@@ -10,7 +10,7 @@ Instructions for humans and coding agents working in this monorepo.
 - **`packages/core`** (`js-pointing-cursor`) — framework-agnostic controller, motion, shapes, click burst
 - **`packages/vue`** (`vue-pointing-cursor`) — thin Vue adapter
 - **`packages/react`** (`react-pointing-cursor`) — thin React adapter
-- **`apps/playground-vue`** / **`apps/playground-react`** — demos
+- **`demo/playground-vue`** / **`demo/playground-react`** — demos (+ `demo/pointing-cursor-demo.gif`)
 - Do **not** recreate a parallel tree under the old root `src/`
 - `registry/vue/registry.json` / `registry/react/registry.json` — editable shadcn catalogs (paths point at `packages/*/src/pointing-cursor/`)
 - Adapter `pointing-cursor/` folders vendor a copy of core (relative imports) for shadcn installs — edit `packages/core`, then run `pnpm shapes:sync` (alias: `pnpm registry:sync`) and commit

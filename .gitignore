@@ -3,7 +3,7 @@ node_modules
 dist
 packages/*/dist
 playground-dist
-apps/*/dist
+demo/*/dist
 test-results
 playwright-report
 *.local

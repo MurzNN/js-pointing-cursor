@@ -11,7 +11,7 @@ import { join, resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const OUT_DIR = join(ROOT, 'tmp/gif-record')
-const GIF_PATH = join(ROOT, 'docs/media/pointing-cursor-demo.gif')
+const GIF_PATH = join(ROOT, 'demo/pointing-cursor-demo.gif')
 const WIDTH = 850
 const HEIGHT = 300
 const BASE = process.argv[2] || 'http://127.0.0.1:5173/'
@@ -74,7 +74,7 @@ const FRAME_CSS = `
 
 rmSync(OUT_DIR, { recursive: true, force: true })
 mkdirSync(OUT_DIR, { recursive: true })
-mkdirSync(join(ROOT, 'docs/media'), { recursive: true })
+mkdirSync(join(ROOT, 'demo'), { recursive: true })
 
 const browser = await chromium.launch()
 const context = await browser.newContext({

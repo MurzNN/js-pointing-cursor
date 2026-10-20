@@ -8,7 +8,7 @@ Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-
 - Follow mode, dangling aim, click press + radiating burst
 - Bundled arrow / pointer / hand SVG shapes
 
-![js-pointing-cursor demo](https://raw.githubusercontent.com/MurzNN/js-pointing-cursor/main/docs/media/pointing-cursor-demo.gif)
+![js-pointing-cursor demo](https://raw.githubusercontent.com/MurzNN/js-pointing-cursor/main/demo/pointing-cursor-demo.gif)
 
 ## Install
 
