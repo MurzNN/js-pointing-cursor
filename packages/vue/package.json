@@ -1,12 +1,11 @@
 {
   "name": "vue-pointing-cursor",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Vue 3 oversized pointing cursor with curved motion, follow mode, and click burst.",
   "type": "module",
   "sideEffects": false,
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "main": "./dist/vue-pointing-cursor.cjs",
   "module": "./dist/vue-pointing-cursor.js",

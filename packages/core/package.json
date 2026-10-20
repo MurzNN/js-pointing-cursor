@@ -5,8 +5,7 @@
   "type": "module",
   "sideEffects": false,
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "main": "./dist/js-pointing-cursor.cjs",
   "module": "./dist/js-pointing-cursor.js",
