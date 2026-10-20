@@ -18,21 +18,21 @@ Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-
 | [`vue-pointing-cursor`](packages/vue) | Vue 3 component |
 | [`react-pointing-cursor`](packages/react) | React component |
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 ## Install
 
 ```bash
 pnpm add vue-pointing-cursor
 ```
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 ## Install
 
 ```bash
 pnpm add react-pointing-cursor
 ```
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 ## Install (npm)
@@ -50,7 +50,7 @@ pnpm add js-pointing-cursor
 ```
 <!-- /pkg:omit -->
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 ## Install via shadcn-vue
 
 From the GitHub registry (copies sources into `components/ui/pointing-cursor`):
@@ -76,9 +76,9 @@ Or point `components.json` at the hosted registry on GitHub Pages:
 ```bash
 pnpm dlx shadcn-vue@latest add @pointing-cursor/vue-pointing-cursor
 ```
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 ## Install via shadcn
 
 From the GitHub registry (copies sources into `components/ui/pointing-cursor`):
@@ -104,7 +104,7 @@ Or with a hosted registry entry on GitHub Pages:
 ```bash
 pnpm dlx shadcn@latest add @pointing-cursor/react-pointing-cursor
 ```
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 ## Install via shadcn-vue (Vue)
@@ -162,7 +162,7 @@ pnpm dlx shadcn@latest add @pointing-cursor/react-pointing-cursor
 > Prefer the npm packages when you want a dependency instead of vendored source. Registry installs are best for apps already using the shadcn / shadcn-vue workflow.
 <!-- /pkg:omit -->
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 ## Quick start
 
 ```vue
@@ -178,9 +178,9 @@ const cursor = ref<InstanceType<typeof PointingCursor> | null>(null)
   <button type="button" @click="cursor?.moveTo(120, 180)">Move</button>
 </template>
 ```
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 ## Quick start
 
 ```tsx
@@ -199,7 +199,7 @@ export function Demo() {
   )
 }
 ```
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 ## Vue quick start
@@ -243,19 +243,19 @@ export function Demo() {
 
 Pass a CSS selector (or an `Element`) instead of coordinates — the cursor moves to the center of the matched element’s bounding box:
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 ```ts
 await cursor.value?.moveTo('#submit')
 await cursor.value?.moveTo('.card button.primary')
 ```
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 ```ts
 await cursor.current?.moveTo('#submit')
 await cursor.current?.moveTo('[data-testid="demo-button"]')
 ```
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 ```ts
@@ -271,19 +271,19 @@ await cursor.current?.moveTo('[data-testid="demo-button"]')
 
 Options work the same as with coordinates:
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 ```ts
 await cursor.value?.moveTo('#submit', { animate: false })
 await cursor.value?.moveTo('#submit', { duration: 800 })
 ```
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 ```ts
 await cursor.current?.moveTo('#submit', { animate: false })
 await cursor.current?.moveTo('#submit', { duration: 800 })
 ```
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 ```ts
@@ -347,13 +347,13 @@ Many icon SVGs fake a stroke with an **outer path + inner hole** (`fill-rule="ev
 
 Do **not** hard-code `#000` / `#fff` (or `currentColor`) on themed paths — those won’t follow the `fill` / `stroke` props. Tip of the cursor should sit near the hotspot for your shape (see `SHAPE_HOTSPOTS` in core).
 
-<!-- pkg:vue -->
+<!-- pkg:vue
 Replace a bundled shape via the default slot, or swap the SVG strings in `SHAPE_SVGS` after a shadcn install. When editing files under `packages/core/src/shapes/`, run `pnpm shapes:sync` so adapters pick up the change.
-<!-- /pkg:vue -->
+-->
 
-<!-- pkg:react -->
+<!-- pkg:react
 Replace a bundled shape via the `children` render prop, or swap the SVG strings in `SHAPE_SVGS` after a shadcn install. When editing files under `packages/core/src/shapes/`, run `pnpm shapes:sync` so adapters pick up the change.
-<!-- /pkg:react -->
+-->
 
 <!-- pkg:omit -->
 Replace a bundled shape via the default slot (Vue) / `children` render prop (React), or swap the SVG strings in `SHAPE_SVGS` after a shadcn install. When editing files under `packages/core/src/shapes/`, run `pnpm shapes:sync` so adapters pick up the change.
@@ -380,7 +380,8 @@ Monorepo layout: `packages/{core,vue,react}`, `apps/playground-{vue,react}`.
 
 <!-- pkg:omit -->
 > Package READMEs on npm are generated from this file via `pnpm readme:packages`.
-> Hidden markers: `<!-- pkg:all|vue|react|core|omit -->` … `<!-- /pkg:… -->`.
+> Visible regions: `<!-- pkg:all|omit -->` … `<!-- /pkg:… -->`.
+> Hidden package-only blocks (whole comment, must not contain `-->`): `<!-- pkg:vue|react|core` … `-->`.
 <!-- /pkg:omit -->
 
 ## Publishing (npm)

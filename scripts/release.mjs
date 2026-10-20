@@ -10,14 +10,18 @@
  *   pnpm release --no-push    # commit + tag locally only
  *   pnpm readme:packages      # regenerate package READMEs only
  *
- * Package READMEs are extracted from the root README.md using HTML comments
- * (invisible on GitHub):
+ * Package READMEs are extracted from the root README.md using HTML comments:
  *
- *   <!-- pkg:all --> … <!-- /pkg:all -->       → every package
- *   <!-- pkg:vue --> … <!-- /pkg:vue -->       → vue-pointing-cursor only
- *   <!-- pkg:react --> … <!-- /pkg:react -->   → react-pointing-cursor only
- *   <!-- pkg:core --> … <!-- /pkg:core -->     → js-pointing-cursor only
- *   <!-- pkg:omit --> … <!-- /pkg:omit -->     → monorepo README only
+ *   Visible on GitHub (region markers):
+ *     <!-- pkg:all --> … <!-- /pkg:all -->     → every package + monorepo
+ *     <!-- pkg:omit --> … <!-- /pkg:omit -->   → monorepo only
+ *
+ *   Hidden on GitHub (whole block is one comment — body must not contain `-->`):
+ *     <!-- pkg:vue
+ *     …markdown…
+ *     -->                                      → vue-pointing-cursor only
+ *     <!-- pkg:react … -->                     → react-pointing-cursor only
+ *     <!-- pkg:core … -->                      → js-pointing-cursor only
  *
  * Nested markers are allowed. Unmarked text is monorepo-only.
  */
@@ -171,43 +175,56 @@ MIT
 }
 
 /**
- * Walk README HTML pkg markers and keep text visible for `pkgId`.
- * Nested markers must all allow the package (`all` or matching id); `omit` hides.
- * Unmarked regions are monorepo-only.
+ * Extract package README body from root README markers.
+ *
+ * - `pkg:all` regions → shared visible content
+ * - `pkg:omit` regions → monorepo only (skipped)
+ * - `<!-- pkg:vue|react|core … -->` hidden blocks → matching package only
+ * - Unmarked text → monorepo only
  */
 function filterByMarkers(source, pkgId) {
-  const tokenRe = /<!--\s*(\/?)pkg:(all|vue|react|core|omit)\s*-->/g
+  // Region markers (visible) OR hidden package-only comment blocks.
+  const tokenRe =
+    /<!--\s*(\/?)pkg:(all|omit)\s*-->|<!--\s*pkg:(vue|react|core)\b([\s\S]*?)-->/g
 
   let out = ''
   let last = 0
-  /** @type {string[]} */
+  /** @type {Array<'all' | 'omit'>} */
   const stack = []
 
-  const includeNow = () => {
-    if (stack.length === 0) return false
-    if (stack.includes('omit')) return false
-    return stack.every((t) => t === 'all' || t === pkgId)
-  }
+  const includeShared = () =>
+    stack.length > 0 && !stack.includes('omit') && stack.every((t) => t === 'all')
 
   for (const m of source.matchAll(tokenRe)) {
-    const idx = m.index
-    const isClose = m[1] === '/'
-    const type = m[2]
+    const idx = m.index ?? 0
 
-    if (includeNow()) {
+    if (includeShared()) {
       out += source.slice(last, idx)
     }
     last = idx + m[0].length
 
-    if (!isClose) {
-      stack.push(type)
-    } else {
-      for (let i = stack.length - 1; i >= 0; i--) {
-        if (stack[i] === type) {
-          stack.splice(i, 1)
-          break
+    if (m[2] != null) {
+      // Region marker: pkg:all | pkg:omit
+      const isClose = m[1] === '/'
+      const type = /** @type {'all' | 'omit'} */ (m[2])
+      if (!isClose) {
+        stack.push(type)
+      } else {
+        for (let i = stack.length - 1; i >= 0; i--) {
+          if (stack[i] === type) {
+            stack.splice(i, 1)
+            break
+          }
         }
       }
+      continue
+    }
+
+    // Hidden package-only block
+    const blockPkg = m[3]
+    const body = m[4] ?? ''
+    if (blockPkg === pkgId && !stack.includes('omit')) {
+      out += body
     }
   }
 
@@ -215,7 +232,7 @@ function filterByMarkers(source, pkgId) {
     throw new Error(`Unclosed pkg marker(s): ${stack.join(', ')}`)
   }
 
-  if (includeNow()) {
+  if (includeShared()) {
     out += source.slice(last)
   }
 

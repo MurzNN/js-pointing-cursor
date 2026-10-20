@@ -53,7 +53,7 @@ PointingCursor (Vue / React shells) → props/lifecycle/refs only
 - Trusted Publisher workflow filename on npmjs.com must match: `publish.yml`
 - Release: `pnpm release` (patch) / `pnpm release minor|major|x.y.z` — bumps both packages, regenerates package READMEs, commits, tags `vX.Y.Z`, pushes (triggers publish)
 - `pnpm readme:packages` — regenerate `packages/{vue,react}/README.md` only
-- Root `README.md` uses hidden markers (`<!-- pkg:all|vue|react|core|omit -->`) for npm README extraction; keep those sections in sync with the real API
+- Root `README.md` markers for npm README extraction: visible `<!-- pkg:all|omit -->` regions; hidden package-only `<!-- pkg:vue|react|core … -->` comment blocks (body must not contain `-->`)
 
 ## Done checklist
 
