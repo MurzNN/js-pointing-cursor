@@ -215,6 +215,19 @@ pnpm build:playground
 
 Monorepo layout: `packages/{core,vue,react}`, `apps/playground-{vue,react}`.
 
+## Publishing (npm)
+
+`vue-pointing-cursor` and `react-pointing-cursor` publish from GitHub Actions via [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC). Workflow file: [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
+
+```bash
+# 1. Bump version in packages/vue/package.json and packages/react/package.json
+# 2. Commit the bump
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+Pushing a `v*` tag runs tests, builds, and publishes both packages. The trusted-publisher workflow filename on npmjs.com must be exactly `publish.yml`.
+
 ## License
 
 MIT

@@ -46,6 +46,13 @@ PointingCursor (Vue / React shells) → props/lifecycle/refs only
 - Overlay stays `pointer-events: none`; real clicks use `elementFromPoint` + `dispatchEvent`
 - Keep README and playground snippets aligned with the real API
 
+## Publishing
+
+- npm Trusted Publishing (OIDC): `.github/workflows/publish.yml` on `v*` tags
+- Publishes `vue-pointing-cursor` + `react-pointing-cursor` only (not core)
+- Trusted Publisher workflow filename on npmjs.com must match: `publish.yml`
+- Release: bump both package versions → commit → `git tag vX.Y.Z && git push origin vX.Y.Z`
+
 ## Done checklist
 
 ```bash

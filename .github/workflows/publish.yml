@@ -1,0 +1,55 @@
+# Publishes vue-pointing-cursor + react-pointing-cursor via npm Trusted Publishing (OIDC).
+# The Trusted Publisher "Workflow filename" on npmjs.com must be exactly: publish.yml
+#
+# Release:
+#   1. Bump versions in packages/{vue,react}/package.json
+#   2. Commit, then: git tag vX.Y.Z && git push origin vX.Y.Z
+name: Publish packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # required for npm OIDC
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      # Trusted publishing needs npm >= 11.5.1 (Node's bundled npm may be older).
+      - name: Ensure npm supports OIDC
+        run: npm install -g npm@^11.5.1
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck, lint, test
+        run: |
+          pnpm typecheck
+          pnpm lint
+          pnpm test
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Publish to npm
+        run: >
+          pnpm --filter vue-pointing-cursor --filter react-pointing-cursor
+          publish --access public --no-git-checks
