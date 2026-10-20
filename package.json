@@ -20,7 +20,9 @@
     "test": "pnpm --filter js-pointing-cursor test && pnpm --filter vue-pointing-cursor test && pnpm --filter react-pointing-cursor test",
     "test:e2e": "playwright test --workers=1",
     "lint": "eslint .",
-    "typecheck": "pnpm --filter js-pointing-cursor typecheck && pnpm --filter vue-pointing-cursor typecheck && pnpm --filter react-pointing-cursor typecheck"
+    "typecheck": "pnpm --filter js-pointing-cursor typecheck && pnpm --filter vue-pointing-cursor typecheck && pnpm --filter react-pointing-cursor typecheck",
+    "readme:packages": "node scripts/release.mjs --readme-only",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

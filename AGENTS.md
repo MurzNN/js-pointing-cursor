@@ -51,7 +51,9 @@ PointingCursor (Vue / React shells) → props/lifecycle/refs only
 - npm Trusted Publishing (OIDC): `.github/workflows/publish.yml` on `v*` tags
 - Publishes `vue-pointing-cursor` + `react-pointing-cursor` only (not core)
 - Trusted Publisher workflow filename on npmjs.com must match: `publish.yml`
-- Release: bump both package versions → commit → `git tag vX.Y.Z && git push origin vX.Y.Z`
+- Release: `pnpm release` (patch) / `pnpm release minor|major|x.y.z` — bumps both packages, regenerates package READMEs, commits, tags `vX.Y.Z`, pushes (triggers publish)
+- `pnpm readme:packages` — regenerate `packages/{vue,react}/README.md` only
+- Root `README.md` uses hidden markers (`<!-- pkg:all|vue|react|core|omit -->`) for npm README extraction; keep those sections in sync with the real API
 
 ## Done checklist
 
