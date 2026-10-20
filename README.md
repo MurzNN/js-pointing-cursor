@@ -10,6 +10,10 @@ Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-
 - Bundled arrow / pointer / hand SVG shapes
 
 ![js-pointing-cursor demo](https://raw.githubusercontent.com/MurzNN/js-pointing-cursor/main/demo/pointing-cursor-demo.gif)
+
+Interactive demos: 
+[Vue playground](https://murznn.github.io/js-pointing-cursor/vue/) 
+| [React playground](https://murznn.github.io/js-pointing-cursor/react/)
 <!-- /pkg:all -->
 
 ## Packages
@@ -361,11 +365,6 @@ Replace a bundled shape via the `children` render prop, or swap the SVG strings 
 Replace a bundled shape via the default slot (Vue) / `children` render prop (React), or swap the SVG strings in `SHAPE_SVGS` after a shadcn install. When editing files under `packages/core/src/shapes/`, run `pnpm shapes:sync` so adapters pick up the change.
 <!-- /pkg:omit -->
 <!-- /pkg:all -->
-
-## Demos
-
-- [Vue playground](https://murznn.github.io/js-pointing-cursor/vue/)
-- [React playground](https://murznn.github.io/js-pointing-cursor/react/)
 
 ## Development
 
