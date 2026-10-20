@@ -23,8 +23,13 @@ describe('headingToRotation', () => {
     expect(headingToRotation(Math.PI, 0)).toBeCloseTo(-90, 5)
   })
 
-  it('compensates arrow defaultAngle (-45) when traveling down', () => {
-    expect(headingToRotation(Math.PI / 2, -45)).toBeCloseTo(-135, 5)
+  it('compensates arrow defaultAngle (-22.5) when traveling down', () => {
+    expect(headingToRotation(Math.PI / 2, -22.5)).toBeCloseTo(-157.5, 5)
+  })
+
+  it('aims arrow tip straight east / west for horizontal travel', () => {
+    expect(headingToRotation(0, -22.5)).toBeCloseTo(112.5, 5)
+    expect(headingToRotation(Math.PI, -22.5)).toBeCloseTo(-67.5, 5)
   })
 })
 

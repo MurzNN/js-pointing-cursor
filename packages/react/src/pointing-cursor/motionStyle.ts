@@ -3,7 +3,7 @@ import type { MotionFrame, MotionStyle, Point } from './types'
 export interface CreateMotionStyleOptions {
   /**
    * Tip orientation at CSS rotate(0), as offset from pointing **up** (degrees).
-   * Hand (finger up) = 0; arrow/pointer (tip up-left) ≈ -45.
+   * Hand (finger up) = 0; arrow ≈ -22.5; pointer (tip up-left) ≈ -45.
    */
   getDefaultAngle?: () => number
   defaultAngle?: number

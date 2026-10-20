@@ -122,10 +122,11 @@ export const SHAPE_HOTSPOTS: Record<ShapeName, { x: number; y: number }> = {
 
 /**
  * Tip offset from pointing **up** at CSS rotate(0), in degrees.
- * Hand index points up → 0. Arrow/pointer tips point up-left → -45.
+ * Hand index points up → 0. Arrow tip bisects the vertical stem and 45°
+ * head edge → -22.5. Pointer tip points up-left → -45.
  */
 export const SHAPE_DEFAULT_ANGLES: Record<ShapeName, number> = {
-  arrow: -45,
+  arrow: -22.5,
   pointer: -45,
   hand: 0,
 }
