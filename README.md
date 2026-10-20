@@ -119,6 +119,27 @@ export function Demo() {
 }
 ```
 
+## `moveTo` with CSS selectors
+
+Pass a CSS selector (or an `Element`) instead of coordinates — the cursor moves to the center of the matched element’s bounding box:
+
+```ts
+// Vue
+await cursor.value?.moveTo('#submit')
+await cursor.value?.moveTo('.card button.primary')
+
+// React
+await cursor.current?.moveTo('#submit')
+await cursor.current?.moveTo('[data-testid="demo-button"]')
+```
+
+Options work the same as with coordinates:
+
+```ts
+await cursor.value?.moveTo('#submit', { animate: false })
+await cursor.value?.moveTo('#submit', { duration: 800 })
+```
+
 ## Custom SVG shapes
 
 The component paints shapes with two CSS variables (defaults match a classic white cursor with a black outline):
