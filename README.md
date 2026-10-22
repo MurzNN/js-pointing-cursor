@@ -245,7 +245,41 @@ export function Demo() {
 <!-- /pkg:omit -->
 
 <!-- pkg:all -->
-## `moveTo` with CSS selectors
+## Imperative API (via ref)
+
+<!-- pkg:vue
+The component exposes these methods on its ref. All motion and click helpers return a `Promise` that resolves when the animation (and optional real DOM event) finishes.
+-->
+<!-- pkg:react
+The component exposes these methods on its `PointingCursorHandle` ref. All motion and click helpers return a `Promise` that resolves when the animation (and optional real DOM event) finishes.
+-->
+<!-- pkg:omit -->
+The component exposes these methods on its ref (Vue instance / React `PointingCursorHandle`). All motion and click helpers return a `Promise` that resolves when the animation (and optional real DOM event) finishes.
+<!-- /pkg:omit -->
+
+| Method | Role |
+| --- | --- |
+| `moveTo(target, …)` | Curved move to coords, a CSS selector, or an `Element` |
+| `click(options?)` | Press animation (+ optional real click) at the **current** position |
+| `clickAt(target, …)` | Move (optional) then `click` at a target |
+| `leftClick(options?)` | Shortcut for `click({ …options, button: 'left' })` |
+| `rightClick(options?)` | Shortcut for `click({ …options, button: 'right' })` |
+| `show()` / `hide()` | Toggle visibility (same as the `visible` prop) |
+| `setFollow(enabled)` | Start/stop follow-mouse mode |
+| `getPosition()` | Current hotspot `{ x, y }` in viewport pixels |
+| `setMotionStyle(style)` | `'dangling'` (default) or `'standard'` rotation |
+
+### `moveTo`
+
+```ts
+moveTo(x: number, y: number, options?: MoveToOptions): Promise<void>
+moveTo(selectorOrElement: string | Element, options?: MoveToOptions): Promise<void>
+```
+
+| Option | Default | Role |
+| --- | --- | --- |
+| `animate` | `true` | `false` jumps instantly |
+| `duration` | distance-based (`minDuration`…`maxDuration`) | Fixed travel time in ms |
 
 Pass a CSS selector (or an `Element`) instead of coordinates — the cursor moves to the center of the matched element’s bounding box:
 
@@ -253,6 +287,8 @@ Pass a CSS selector (or an `Element`) instead of coordinates — the cursor move
 ```ts
 await cursor.value?.moveTo('#submit')
 await cursor.value?.moveTo('.card button.primary')
+await cursor.value?.moveTo('#submit', { animate: false })
+await cursor.value?.moveTo('#submit', { duration: 800 })
 ```
 -->
 
@@ -260,6 +296,8 @@ await cursor.value?.moveTo('.card button.primary')
 ```ts
 await cursor.current?.moveTo('#submit')
 await cursor.current?.moveTo('[data-testid="demo-button"]')
+await cursor.current?.moveTo('#submit', { animate: false })
+await cursor.current?.moveTo('#submit', { duration: 800 })
 ```
 -->
 
@@ -268,35 +306,163 @@ await cursor.current?.moveTo('[data-testid="demo-button"]')
 // Vue
 await cursor.value?.moveTo('#submit')
 await cursor.value?.moveTo('.card button.primary')
+await cursor.value?.moveTo('#submit', { animate: false })
+await cursor.value?.moveTo('#submit', { duration: 800 })
 
 // React
 await cursor.current?.moveTo('#submit')
 await cursor.current?.moveTo('[data-testid="demo-button"]')
+await cursor.current?.moveTo('#submit', { animate: false })
+await cursor.current?.moveTo('#submit', { duration: 800 })
 ```
 <!-- /pkg:omit -->
 
-Options work the same as with coordinates:
+### `click` / `clickAt` / `leftClick` / `rightClick`
+
+```ts
+click(options?: ClickOptions): Promise<void>
+leftClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
+rightClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
+
+clickAt(x: number, y: number, options?: ClickOptions): Promise<void>
+clickAt(selectorOrElement: string | Element, options?: ClickOptions): Promise<void>
+```
+
+`click` plays the press scale at the **current** hotspot. `clickAt` resolves a target the same way as `moveTo`, optionally moves there, then clicks.
+
+| Option | Default | Role |
+| --- | --- | --- |
+| `button` | `'left'` | `'left'` or `'right'` (ignored by `leftClick` / `rightClick`) |
+| `real` | `false` | When `true`, dispatches pointer/mouse events on the element under the hotspot (`elementFromPoint`) |
+| `animate` | `true` | Press-scale animation; also controls whether `clickAt` travels with a curve (`false` jumps) |
+| `burst` | prop `clickBurst` | Radiating-lines overlay at the click point |
+| `delayMs` | prop `clickAnimationDuration` | Press hold duration in ms |
+| `move` | `true` (`clickAt` only) | When `false`, teleports to the target (no travel) before clicking |
+
+Visual-only press (no DOM events):
 
 <!-- pkg:vue
 ```ts
-await cursor.value?.moveTo('#submit', { animate: false })
-await cursor.value?.moveTo('#submit', { duration: 800 })
+await cursor.value?.leftClick({ real: false })
+await cursor.value?.rightClick({ real: false })
 ```
 -->
 
 <!-- pkg:react
 ```ts
-await cursor.current?.moveTo('#submit', { animate: false })
-await cursor.current?.moveTo('#submit', { duration: 800 })
+await cursor.current?.leftClick({ real: false })
+await cursor.current?.rightClick({ real: false })
 ```
 -->
 
 <!-- pkg:omit -->
 ```ts
-await cursor.value?.moveTo('#submit', { animate: false })
-await cursor.value?.moveTo('#submit', { duration: 800 })
+// Vue
+await cursor.value?.leftClick({ real: false })
+await cursor.value?.rightClick({ real: false })
+
+// React
+await cursor.current?.leftClick({ real: false })
+await cursor.current?.rightClick({ real: false })
 ```
 <!-- /pkg:omit -->
+
+Move to a control and fire a real click:
+
+<!-- pkg:vue
+```ts
+await cursor.value?.clickAt('#submit', { real: true })
+await cursor.value?.clickAt('#submit', { real: true, button: 'right' })
+await cursor.value?.clickAt(120, 180, { real: true, move: false })
+```
+-->
+
+<!-- pkg:react
+```ts
+await cursor.current?.clickAt('#submit', { real: true })
+await cursor.current?.clickAt('#submit', { real: true, button: 'right' })
+await cursor.current?.clickAt(120, 180, { real: true, move: false })
+```
+-->
+
+<!-- pkg:omit -->
+```ts
+// Vue
+await cursor.value?.clickAt('#submit', { real: true })
+await cursor.value?.clickAt('#submit', { real: true, button: 'right' })
+await cursor.value?.clickAt(120, 180, { real: true, move: false })
+
+// React
+await cursor.current?.clickAt('#submit', { real: true })
+await cursor.current?.clickAt('#submit', { real: true, button: 'right' })
+await cursor.current?.clickAt(120, 180, { real: true, move: false })
+```
+<!-- /pkg:omit -->
+
+Or click where the cursor already is:
+
+<!-- pkg:vue
+```ts
+await cursor.value?.moveTo('#submit')
+await cursor.value?.click({ real: true, button: 'left' })
+```
+-->
+
+<!-- pkg:react
+```ts
+await cursor.current?.moveTo('#submit')
+await cursor.current?.click({ real: true, button: 'left' })
+```
+-->
+
+<!-- pkg:omit -->
+```ts
+await cursor.value?.moveTo('#submit')
+await cursor.value?.click({ real: true, button: 'left' })
+```
+<!-- /pkg:omit -->
+
+### Visibility, follow, position, motion style
+
+<!-- pkg:vue
+```ts
+cursor.value?.show()
+cursor.value?.hide()
+cursor.value?.setFollow(true)
+cursor.value?.setMotionStyle('standard')
+const { x, y } = cursor.value?.getPosition() ?? { x: 0, y: 0 }
+```
+-->
+
+<!-- pkg:react
+```ts
+cursor.current?.show()
+cursor.current?.hide()
+cursor.current?.setFollow(true)
+cursor.current?.setMotionStyle('standard')
+const { x, y } = cursor.current?.getPosition() ?? { x: 0, y: 0 }
+```
+-->
+
+<!-- pkg:omit -->
+```ts
+// Vue
+cursor.value?.show()
+cursor.value?.hide()
+cursor.value?.setFollow(true)
+cursor.value?.setMotionStyle('standard')
+const { x, y } = cursor.value?.getPosition() ?? { x: 0, y: 0 }
+
+// React
+cursor.current?.show()
+cursor.current?.hide()
+cursor.current?.setFollow(true)
+cursor.current?.setMotionStyle('standard')
+const { x, y } = cursor.current?.getPosition() ?? { x: 0, y: 0 }
+```
+<!-- /pkg:omit -->
+
+`setFollow(true)` tracks the native pointer (and can hide it via `hideNativeCursor`). While following, `mirrorNativeClicks` mirrors real mouse downs as press + burst on the oversized cursor.
 
 ## Custom SVG shapes
 

@@ -10,6 +10,10 @@ Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-
 
 ![js-pointing-cursor demo](https://raw.githubusercontent.com/MurzNN/js-pointing-cursor/main/demo/pointing-cursor-demo.gif)
 
+Interactive demos: 
+[Vue playground](https://murznn.github.io/js-pointing-cursor/vue/) 
+| [React playground](https://murznn.github.io/js-pointing-cursor/react/)
+
 ## Install
 
 ```bash
@@ -61,21 +65,98 @@ export function Demo() {
 }
 ```
 
-## `moveTo` with CSS selectors
+## Imperative API (via ref)
+
+The component exposes these methods on its `PointingCursorHandle` ref. All motion and click helpers return a `Promise` that resolves when the animation (and optional real DOM event) finishes.
+
+| Method | Role |
+| --- | --- |
+| `moveTo(target, …)` | Curved move to coords, a CSS selector, or an `Element` |
+| `click(options?)` | Press animation (+ optional real click) at the **current** position |
+| `clickAt(target, …)` | Move (optional) then `click` at a target |
+| `leftClick(options?)` | Shortcut for `click({ …options, button: 'left' })` |
+| `rightClick(options?)` | Shortcut for `click({ …options, button: 'right' })` |
+| `show()` / `hide()` | Toggle visibility (same as the `visible` prop) |
+| `setFollow(enabled)` | Start/stop follow-mouse mode |
+| `getPosition()` | Current hotspot `{ x, y }` in viewport pixels |
+| `setMotionStyle(style)` | `'dangling'` (default) or `'standard'` rotation |
+
+### `moveTo`
+
+```ts
+moveTo(x: number, y: number, options?: MoveToOptions): Promise<void>
+moveTo(selectorOrElement: string | Element, options?: MoveToOptions): Promise<void>
+```
+
+| Option | Default | Role |
+| --- | --- | --- |
+| `animate` | `true` | `false` jumps instantly |
+| `duration` | distance-based (`minDuration`…`maxDuration`) | Fixed travel time in ms |
 
 Pass a CSS selector (or an `Element`) instead of coordinates — the cursor moves to the center of the matched element’s bounding box:
 
 ```ts
 await cursor.current?.moveTo('#submit')
 await cursor.current?.moveTo('[data-testid="demo-button"]')
-```
-
-Options work the same as with coordinates:
-
-```ts
 await cursor.current?.moveTo('#submit', { animate: false })
 await cursor.current?.moveTo('#submit', { duration: 800 })
 ```
+
+### `click` / `clickAt` / `leftClick` / `rightClick`
+
+```ts
+click(options?: ClickOptions): Promise<void>
+leftClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
+rightClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
+
+clickAt(x: number, y: number, options?: ClickOptions): Promise<void>
+clickAt(selectorOrElement: string | Element, options?: ClickOptions): Promise<void>
+```
+
+`click` plays the press scale at the **current** hotspot. `clickAt` resolves a target the same way as `moveTo`, optionally moves there, then clicks.
+
+| Option | Default | Role |
+| --- | --- | --- |
+| `button` | `'left'` | `'left'` or `'right'` (ignored by `leftClick` / `rightClick`) |
+| `real` | `false` | When `true`, dispatches pointer/mouse events on the element under the hotspot (`elementFromPoint`) |
+| `animate` | `true` | Press-scale animation; also controls whether `clickAt` travels with a curve (`false` jumps) |
+| `burst` | prop `clickBurst` | Radiating-lines overlay at the click point |
+| `delayMs` | prop `clickAnimationDuration` | Press hold duration in ms |
+| `move` | `true` (`clickAt` only) | When `false`, teleports to the target (no travel) before clicking |
+
+Visual-only press (no DOM events):
+
+```ts
+await cursor.current?.leftClick({ real: false })
+await cursor.current?.rightClick({ real: false })
+```
+
+Move to a control and fire a real click:
+
+```ts
+await cursor.current?.clickAt('#submit', { real: true })
+await cursor.current?.clickAt('#submit', { real: true, button: 'right' })
+await cursor.current?.clickAt(120, 180, { real: true, move: false })
+```
+
+Or click where the cursor already is:
+
+```ts
+await cursor.current?.moveTo('#submit')
+await cursor.current?.click({ real: true, button: 'left' })
+```
+
+### Visibility, follow, position, motion style
+
+```ts
+cursor.current?.show()
+cursor.current?.hide()
+cursor.current?.setFollow(true)
+cursor.current?.setMotionStyle('standard')
+const { x, y } = cursor.current?.getPosition() ?? { x: 0, y: 0 }
+```
+
+`setFollow(true)` tracks the native pointer (and can hide it via `hideNativeCursor`). While following, `mirrorNativeClicks` mirrors real mouse downs as press + burst on the oversized cursor.
 
 ## Custom SVG shapes
 
