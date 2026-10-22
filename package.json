@@ -1,7 +1,7 @@
 {
   "name": "js-pointing-cursor-monorepo",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.0",
   "description": "Monorepo for js-pointing-cursor, vue-pointing-cursor, and react-pointing-cursor.",
   "type": "module",
   "scripts": {

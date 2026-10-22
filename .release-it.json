@@ -12,17 +12,19 @@
     "releaseName": "v${version}",
     "autoGenerate": false
   },
-  "npm": {
-    "publish": false
-  },
+  "npm": false,
   "plugins": {
     "@release-it/bumper": {
       "in": "packages/vue/package.json",
-      "out": ["packages/vue/package.json", "packages/react/package.json"]
+      "out": [
+        "packages/vue/package.json",
+        "packages/react/package.json",
+        "package.json"
+      ]
     }
   },
   "hooks": {
     "before:init": "pnpm readme:packages && git add packages/vue/README.md packages/react/README.md",
-    "after:bump": "node scripts/prepend-changelog.mjs ${version} && git add CHANGELOG.md"
+    "after:bump": "node scripts/prepend-changelog.mjs ${version} && git add CHANGELOG.md package.json packages/vue/package.json packages/react/package.json"
   }
 }
