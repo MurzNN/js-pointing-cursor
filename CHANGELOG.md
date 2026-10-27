@@ -4,6 +4,14 @@ Notable changes to `vue-pointing-cursor` / `react-pointing-cursor` (and shared c
 Each release prepends a section from commits since the previous tag;
 GitHub Releases use the same notes.
 
+## [0.3.1] - 2026-10-27
+
+### Changes
+
+- fix: export PointingCursor only, drop the Vue plugin (73367f2)
+
+**Full changelog**: https://github.com/MurzNN/js-pointing-cursor/compare/v0.3.0...v0.3.1
+
 ## [0.3.0] - 2026-10-27
 
 ### Changes
