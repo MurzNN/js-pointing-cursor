@@ -4,6 +4,14 @@ Notable changes to `vue-pointing-cursor` / `react-pointing-cursor` (and shared c
 Each release prepends a section from commits since the previous tag;
 GitHub Releases use the same notes.
 
+## [0.3.0] - 2026-10-27
+
+### Changes
+
+- feat: teleport overlay, resize retarget, and local coordinateRoot (fd7cd6c)
+
+**Full changelog**: https://github.com/MurzNN/js-pointing-cursor/compare/v0.2.1...v0.3.0
+
 ## [0.2.1] - 2026-10-22
 
 ### Changes
