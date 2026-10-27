@@ -1,4 +1,3 @@
-import type { App, Plugin } from 'vue'
 import PointingCursor from './PointingCursor.vue'
 
 export type {
@@ -39,13 +38,3 @@ export {
 
 export { PointingCursor }
 export { PointingCursor as default }
-
-export interface PointingCursorPluginOptions {
-  name?: string
-}
-
-export const PointingCursorPlugin: Plugin = {
-  install(app: App, options: PointingCursorPluginOptions = {}) {
-    app.component(options.name ?? 'PointingCursor', PointingCursor)
-  },
-}

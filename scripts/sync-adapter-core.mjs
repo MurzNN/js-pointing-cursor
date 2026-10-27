@@ -138,8 +138,7 @@ export const SHAPE_DEFAULT_ANGLES: Record<ShapeName, number> = {
 const adapters = [
   {
     dir: join(root, 'packages/vue/src/pointing-cursor'),
-    index: `import type { App, Plugin } from 'vue'
-import PointingCursor from './PointingCursor.vue'
+    index: `import PointingCursor from './PointingCursor.vue'
 
 export type {
   ShapeName,
@@ -179,16 +178,6 @@ export {
 
 export { PointingCursor }
 export { PointingCursor as default }
-
-export interface PointingCursorPluginOptions {
-  name?: string
-}
-
-export const PointingCursorPlugin: Plugin = {
-  install(app: App, options: PointingCursorPluginOptions = {}) {
-    app.component(options.name ?? 'PointingCursor', PointingCursor)
-  },
-}
 `,
   },
   {

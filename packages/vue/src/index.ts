@@ -1,8 +1,6 @@
 export {
   PointingCursor,
   PointingCursor as default,
-  PointingCursorPlugin,
-  type PointingCursorPluginOptions,
 } from './pointing-cursor'
 
 export type {
