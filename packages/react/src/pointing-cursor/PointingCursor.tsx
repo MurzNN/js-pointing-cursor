@@ -232,7 +232,7 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
         controllerRef.current = null
       }
       // Remount when portal host appears; options synced below.
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional host-gated mount
+      // Intentional host-gated mount (deps are incomplete on purpose).
     }, [host, teleportTo])
 
     useEffect(() => {
