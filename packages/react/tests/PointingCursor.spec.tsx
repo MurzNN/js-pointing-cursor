@@ -5,13 +5,29 @@ import { PointingCursor, type PointingCursorHandle } from '../src'
 
 describe('PointingCursor', () => {
   it('renders the default arrow shape', () => {
+    const { unmount } = render(<PointingCursor x={100} y={100} />)
+    expect(document.querySelector('.pointing-cursor')).toBeTruthy()
+    expect(
+      document.querySelector('.pointing-cursor-shape--arrow'),
+    ).toBeTruthy()
+    unmount()
+  })
+
+  it('teleports the overlay to document.body by default', () => {
+    const { unmount } = render(<PointingCursor x={100} y={100} />)
+    const root = document.querySelector('.pointing-cursor')
+    expect(root?.parentElement).toBe(document.body)
+    unmount()
+  })
+
+  it('keeps the overlay in-place when teleportTo is false', () => {
     const { container, unmount } = render(
-      <PointingCursor x={100} y={100} />,
+      <PointingCursor x={100} y={100} teleportTo={false} />,
     )
     expect(container.querySelector('.pointing-cursor')).toBeTruthy()
-    expect(
-      container.querySelector('.pointing-cursor-shape--arrow'),
-    ).toBeTruthy()
+    expect(document.body.querySelector('.pointing-cursor')).toBe(
+      container.querySelector('.pointing-cursor'),
+    )
     unmount()
   })
 

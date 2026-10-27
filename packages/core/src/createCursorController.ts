@@ -68,6 +68,18 @@ export interface CursorControllerConfig {
   clickBurstRightColor: string
   clickBurstColor: string
   emitMoveFrames: boolean
+  /**
+   * When the last `moveTo` / `clickAt` targeted a selector, Element, or local
+   * numeric point (with `coordinateRoot`), re-resolve and jump on window /
+   * visualViewport resize (no animation).
+   */
+  retargetOnResize: boolean
+  /**
+   * When set, numeric `moveTo(x, y)` / `clickAt(x, y)` use this element's
+   * local CSS pixel space (layout size before CSS transforms). Paint/follow/
+   * clicks remain in viewport space. Example: Slidev `#slide-content`.
+   */
+  coordinateRoot: string | Element | null
 }
 
 export const DEFAULT_CURSOR_CONFIG: CursorControllerConfig = {
@@ -92,7 +104,13 @@ export const DEFAULT_CURSOR_CONFIG: CursorControllerConfig = {
   clickBurstRightColor: '#ef4444',
   clickBurstColor: '#111111',
   emitMoveFrames: false,
+  retargetOnResize: true,
+  coordinateRoot: null,
 }
+
+type PinnedTarget =
+  | { kind: 'dom'; target: string | Element }
+  | { kind: 'local'; x: number; y: number }
 
 const MOVE_EMIT_INTERVAL_MS = 30
 const FOLLOW_IDLE_MS = 100
@@ -119,6 +137,8 @@ export interface CursorController {
   leftClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
   rightClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
   setMotionStyle(style: MotionStyle): void
+  /** Re-resolve the last selector/Element target and jump (no animation). */
+  retarget(): void
   getShapeMarkup(): string
   getShapePaintStyle(): Record<string, string>
   getInteraction(): {
@@ -156,6 +176,10 @@ export function createCursorController(
   let nativeCursorBackup = ''
   let lastMoveEmitAt = 0
   const activeBursts: Array<{ destroy(): void }> = []
+  /** Last moveTo/clickAt target; used to re-aim after resize. */
+  let pinnedTarget: PinnedTarget | null = null
+  let resizeRaf = 0
+  let resizeListening = false
 
   let motionStyleValue: MotionStyle = config.motionStyle
 
@@ -275,6 +299,79 @@ export function createCursorController(
     hooks.onHide?.()
   }
 
+  function pinMoveTarget(
+    target: number | string | Element,
+    y?: number,
+  ): void {
+    if (
+      typeof target === 'string' ||
+      (typeof Element !== 'undefined' && target instanceof Element)
+    ) {
+      pinnedTarget = { kind: 'dom', target }
+      return
+    }
+    if (typeof target === 'number' && typeof y === 'number' && config.coordinateRoot) {
+      pinnedTarget = { kind: 'local', x: target, y }
+      return
+    }
+    pinnedTarget = null
+  }
+
+  function resolvePinnedPoint(): Point | null {
+    if (!pinnedTarget) return null
+    try {
+      if (pinnedTarget.kind === 'dom') {
+        return resolveMoveTarget(pinnedTarget.target)
+      }
+      return resolveMoveTarget(
+        pinnedTarget.x,
+        pinnedTarget.y,
+        config.coordinateRoot,
+      )
+    } catch {
+      return null
+    }
+  }
+
+  function retargetPinned(options?: { force?: boolean }): void {
+    if (!config.retargetOnResize && !options?.force) return
+    if (following || !pinnedTarget) return
+
+    const point = resolvePinnedPoint()
+    if (!point) return
+
+    cancelMotion()
+    jumpTo(point, (f) => applyFrame(f, { emitBoundary: true }))
+    motionStyleApi.onSettle()
+  }
+
+  function onViewportResize(): void {
+    if (!config.retargetOnResize || following || !pinnedTarget) return
+    if (resizeRaf) return
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = 0
+      retargetPinned()
+    })
+  }
+
+  function startResizeListening(): void {
+    if (resizeListening || typeof window === 'undefined') return
+    window.addEventListener('resize', onViewportResize)
+    window.visualViewport?.addEventListener('resize', onViewportResize)
+    resizeListening = true
+  }
+
+  function stopResizeListening(): void {
+    if (!resizeListening || typeof window === 'undefined') return
+    window.removeEventListener('resize', onViewportResize)
+    window.visualViewport?.removeEventListener('resize', onViewportResize)
+    if (resizeRaf) {
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = 0
+    }
+    resizeListening = false
+  }
+
   async function moveTo(
     target: number | string | Element,
     yOrOptions?: number | MoveToOptions,
@@ -284,11 +381,17 @@ export function createCursorController(
     let options: MoveToOptions = {}
 
     if (typeof target === 'number') {
-      point = resolveMoveTarget(target, yOrOptions as number)
+      point = resolveMoveTarget(
+        target,
+        yOrOptions as number,
+        config.coordinateRoot,
+      )
       options = maybeOptions ?? {}
+      pinMoveTarget(target, yOrOptions as number)
     } else {
       point = resolveMoveTarget(target)
       options = (yOrOptions as MoveToOptions | undefined) ?? {}
+      pinMoveTarget(target)
     }
 
     cancelMotion()
@@ -440,6 +543,8 @@ export function createCursorController(
       stopFollowLoop()
       restoreNativeCursor()
       motionStyleApi.onSettle()
+      // Re-stick to the last DOM target after leaving follow mode.
+      retargetPinned()
     } else {
       startFollowLoop()
       applyNativeCursorHide()
@@ -465,20 +570,32 @@ export function createCursorController(
     yOrOptions?: number | ClickOptions,
     maybeOptions?: ClickOptions,
   ): Promise<void> {
-    let point: Point
     let options: ClickOptions = {}
 
     if (typeof target === 'number') {
-      point = resolveMoveTarget(target, yOrOptions as number)
       options = maybeOptions ?? {}
     } else {
-      point = resolveMoveTarget(target)
       options = (yOrOptions as ClickOptions | undefined) ?? {}
     }
 
     if (options.move !== false) {
-      await moveTo(point.x, point.y, { animate: options.animate !== false })
+      // Pass the original target so selector/Element/local pins survive resize.
+      if (typeof target === 'number') {
+        await moveTo(target, yOrOptions as number, {
+          animate: options.animate !== false,
+        })
+      } else {
+        await moveTo(target, { animate: options.animate !== false })
+      }
     } else {
+      const point =
+        typeof target === 'number'
+          ? resolveMoveTarget(target, yOrOptions as number, config.coordinateRoot)
+          : resolveMoveTarget(target)
+      pinMoveTarget(
+        target,
+        typeof target === 'number' ? (yOrOptions as number) : undefined,
+      )
       jumpTo(point, (f) => applyFrame(f, { emitBoundary: true }))
     }
 
@@ -532,9 +649,11 @@ export function createCursorController(
 
   function mount(): void {
     if (typeof config.x === 'number' && typeof config.y === 'number') {
-      jumpTo({ x: config.x, y: config.y }, (f) =>
-        applyFrame(f, { emitBoundary: true }),
-      )
+      const point = resolveMoveTarget(config.x, config.y, config.coordinateRoot)
+      if (config.coordinateRoot) {
+        pinnedTarget = { kind: 'local', x: config.x, y: config.y }
+      }
+      jumpTo(point, (f) => applyFrame(f, { emitBoundary: true }))
     } else if (typeof window !== 'undefined') {
       jumpTo(
         { x: window.innerWidth / 2, y: window.innerHeight / 2 },
@@ -546,13 +665,16 @@ export function createCursorController(
     if (config.followMouse) {
       setFollow(true)
     }
+    startResizeListening()
     hooks.onVisibilityChange?.(visible)
   }
 
   function destroy(): void {
     cancelMotion()
     stopFollowLoop()
+    stopResizeListening()
     restoreNativeCursor()
+    pinnedTarget = null
     for (const b of activeBursts.splice(0)) b.destroy()
   }
 
@@ -569,6 +691,8 @@ export function createCursorController(
     leftClick: (o) => click({ ...o, button: 'left' }),
     rightClick: (o) => click({ ...o, button: 'right' }),
     setMotionStyle,
+    /** Re-resolve the last selector/Element target and jump (no animation). */
+    retarget: () => retargetPinned({ force: true }),
     getShapeMarkup: () => SHAPE_SVGS[config.shape],
     getShapePaintStyle: () => ({
       '--pointing-cursor-fill': config.fill,

@@ -21,9 +21,10 @@ Instructions for humans and coding agents working in this monorepo.
 
 ```
 createCursorController (core)
-  → imperative paint on root/inner elements
+  → imperative paint on root/inner elements (viewport coords)
   → mountClickBurst on document.body
 PointingCursor (Vue / React shells) → props/lifecycle/refs only
+  → default Teleport / createPortal to document.body (`teleportTo`)
 ```
 
 | Concern | Module |
@@ -44,6 +45,8 @@ PointingCursor (Vue / React shells) → props/lifecycle/refs only
 - No Tailwind / UnoCSS as a library dependency
 - `moveTo` must keep **curved, randomized** Bézier motion
 - Overlay stays `pointer-events: none`; real clicks use `elementFromPoint` + `dispatchEvent`
+- Default `teleportTo: 'body'` so fixed positioning is not trapped by transformed ancestors; paint/follow/clicks stay viewport-absolute
+- Optional `coordinateRoot` maps numeric `moveTo(x,y)` through an element’s local CSS space (Slidev `#slide-content`)
 - Keep README and playground snippets aligned with the real API
 
 ## Publishing

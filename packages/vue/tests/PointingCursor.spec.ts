@@ -2,27 +2,54 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { PointingCursor } from '../src'
 
+function cursorRoot(): HTMLElement {
+  const el = document.querySelector('.pointing-cursor')
+  expect(el).toBeTruthy()
+  return el as HTMLElement
+}
+
 describe('PointingCursor', () => {
   it('renders the default arrow shape', () => {
     const wrapper = mount(PointingCursor, {
       props: { x: 100, y: 100 },
       attachTo: document.body,
     })
-    expect(wrapper.find('.pointing-cursor').exists()).toBe(true)
-    expect(wrapper.find('.pointing-cursor-shape--arrow').exists()).toBe(true)
+    expect(document.querySelector('.pointing-cursor')).toBeTruthy()
+    expect(document.querySelector('.pointing-cursor-shape--arrow')).toBeTruthy()
     wrapper.unmount()
   })
 
-  it('forwards fallthrough attrs to the cursor root (multi-root template)', () => {
+  it('forwards fallthrough attrs to the cursor root', () => {
     const wrapper = mount(PointingCursor, {
       props: { x: 100, y: 100 },
       attrs: { 'data-testid': 'vue-cursor' },
       attachTo: document.body,
     })
-    expect(wrapper.find('.pointing-cursor').attributes('data-testid')).toBe(
-      'vue-cursor',
-    )
+    expect(cursorRoot().getAttribute('data-testid')).toBe('vue-cursor')
     wrapper.unmount()
+  })
+
+  it('teleports the overlay to document.body by default', () => {
+    const wrapper = mount(PointingCursor, {
+      props: { x: 100, y: 100 },
+      attachTo: document.body,
+    })
+    expect(cursorRoot().parentElement).toBe(document.body)
+    wrapper.unmount()
+  })
+
+  it('keeps the overlay in-place when teleportTo is false', () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const wrapper = mount(PointingCursor, {
+      props: { x: 100, y: 100, teleportTo: false },
+      attachTo: host,
+    })
+    const root = cursorRoot()
+    expect(host.contains(root)).toBe(true)
+    expect(root.parentElement).not.toBe(document.body)
+    wrapper.unmount()
+    host.remove()
   })
 
   it('exposes show/hide and toggles visibility class', async () => {
@@ -36,10 +63,10 @@ describe('PointingCursor', () => {
     }
     api.hide()
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.pointing-cursor').classes()).toContain('pointing-cursor--hidden')
+    expect(cursorRoot().classList.contains('pointing-cursor--hidden')).toBe(true)
     api.show()
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.pointing-cursor').classes()).not.toContain('pointing-cursor--hidden')
+    expect(cursorRoot().classList.contains('pointing-cursor--hidden')).toBe(false)
     wrapper.unmount()
   })
 
@@ -58,7 +85,7 @@ describe('PointingCursor', () => {
     }
     await api.moveTo(200, 150, { animate: false })
     expect(api.getPosition()).toEqual({ x: 200, y: 150 })
-    const root = wrapper.find('.pointing-cursor').element as HTMLElement
+    const root = cursorRoot()
     expect(root.style.transform).toContain('200px')
     expect(root.style.transform).toContain('150px')
     wrapper.unmount()
@@ -140,9 +167,9 @@ describe('PointingCursor', () => {
       props: { shape: 'hand', x: 1, y: 1 },
       attachTo: document.body,
     })
-    expect(wrapper.find('.pointing-cursor-shape--hand').exists()).toBe(true)
+    expect(document.querySelector('.pointing-cursor-shape--hand')).toBeTruthy()
     await wrapper.setProps({ shape: 'pointer' })
-    expect(wrapper.find('.pointing-cursor-shape--pointer').exists()).toBe(true)
+    expect(document.querySelector('.pointing-cursor-shape--pointer')).toBeTruthy()
     wrapper.unmount()
   })
 

@@ -37,6 +37,8 @@ export {
 export {
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
 } from './resolveTarget'
 

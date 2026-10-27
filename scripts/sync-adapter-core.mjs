@@ -76,6 +76,8 @@ export {
 export {
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
 } from './resolveTarget'
 
@@ -165,6 +167,8 @@ export {
   samplePath,
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
   mountClickBurst,
   createMotionStyle,
@@ -217,6 +221,8 @@ export {
   samplePath,
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
   mountClickBurst,
   createMotionStyle,
@@ -229,6 +235,7 @@ export { PointingCursor } from './PointingCursor'
 export type {
   PointingCursorProps,
   PointingCursorHandle,
+  PointingCursorTeleportTo,
 } from './PointingCursor'
 export { PointingCursor as default } from './PointingCursor'
 `,

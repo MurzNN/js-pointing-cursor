@@ -3,6 +3,7 @@ export {
   PointingCursor as default,
   type PointingCursorProps,
   type PointingCursorHandle,
+  type PointingCursorTeleportTo,
 } from './pointing-cursor'
 
 export type {
@@ -31,6 +32,8 @@ export {
   samplePath,
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
   mountClickBurst,
   createMotionStyle,

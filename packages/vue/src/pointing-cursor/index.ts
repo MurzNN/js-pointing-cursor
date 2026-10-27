@@ -27,6 +27,8 @@ export {
   samplePath,
   resolveElementCenter,
   resolveMoveTarget,
+  resolveCoordinateRoot,
+  localToViewport,
   TargetResolutionError,
   mountClickBurst,
   createMotionStyle,

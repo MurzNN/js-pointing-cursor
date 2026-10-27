@@ -62,6 +62,35 @@ const cursor = ref<InstanceType<typeof PointingCursor> | null>(null)
 </template>
 ```
 
+## Overlay mounting (`teleportTo`)
+
+By default the cursor DOM is portaled to `document.body` so `position: fixed` tracks the **viewport**. That keeps `moveTo`, follow mode, and clicks correct under CSS-transformed ancestors (for example Slidev’s `scale()`).
+
+| Value | Behavior |
+| --- | --- |
+| `'body'` (default) | Portal to `document.body` |
+| CSS selector / `HTMLElement` | Portal to that node |
+| `false` | Keep the node in the component tree (needs a non-transformed containing block) |
+
+To match a scaled stage’s visual size while still aiming in viewport space, scale the `size` prop (Slidev exposes `--slidev-slide-scale` on `:root`):
+
+```vue
+<PointingCursor size="calc(3em * var(--slidev-slide-scale, 1))" />
+```
+
+After `moveTo(selector | Element)`, the cursor **re-aims on window resize** (and `visualViewport` resize) so it stays on the target when a deck reflows/scales. Disable with `retargetOnResize={false}`, or call `retarget()` manually.
+
+### Local coordinates (`coordinateRoot`)
+
+By default numeric `moveTo(x, y)` is in **viewport** pixels. Set `coordinateRoot` to an element (or selector) to treat numeric coords as that element’s **local CSS pixels** (layout size before CSS transforms) — e.g. Slidev’s design canvas:
+
+```vue
+<PointingCursor coordinate-root="#slide-content" />
+<!-- moveTo(0, 0) → top-left of the slide, not the browser window -->
+```
+
+Local numeric targets are also re-mapped on resize. Selectors/`Element` targets always use viewport bounding boxes.
+
 ## Imperative API (via ref)
 
 The component exposes these methods on its ref. All motion and click helpers return a `Promise` that resolves when the animation (and optional real DOM event) finishes.
@@ -77,6 +106,7 @@ The component exposes these methods on its ref. All motion and click helpers ret
 | `setFollow(enabled)` | Start/stop follow-mouse mode |
 | `getPosition()` | Current hotspot `{ x, y }` in viewport pixels |
 | `setMotionStyle(style)` | `'dangling'` (default) or `'standard'` rotation |
+| `retarget()` | Re-resolve the last selector/Element/local target and jump |
 
 ### `moveTo`
 

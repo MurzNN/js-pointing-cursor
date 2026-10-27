@@ -9,6 +9,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { createCursorController } from './core'
 import type {
   ClickOptions,
@@ -19,6 +20,8 @@ import type {
   Point,
   ShapeName,
 } from './core'
+
+export type PointingCursorTeleportTo = string | HTMLElement | false
 
 export interface PointingCursorProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -48,6 +51,21 @@ export interface PointingCursorProps
   clickBurstRightColor?: string
   clickBurstColor?: string
   emitMoveFrames?: boolean
+  /**
+   * Re-aim at the last selector/Element/local target on window resize (default true).
+   */
+  retargetOnResize?: boolean
+  /**
+   * When set, numeric `moveTo(x, y)` uses this element's local CSS pixel space
+   * (e.g. a scaled slide stage). Selectors still resolve in viewport space.
+   */
+  coordinateRoot?: string | Element | null
+  /**
+   * Mount the fixed overlay under this target so viewport coordinates stay
+   * valid under CSS-transformed ancestors (e.g. slide decks with `scale()`).
+   * Default: `'body'`. Pass `false` to keep the node in-place.
+   */
+  teleportTo?: PointingCursorTeleportTo
   onMove?: (point: Point) => void
   onShow?: () => void
   onHide?: () => void
@@ -78,6 +96,18 @@ export interface PointingCursorHandle {
   leftClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
   rightClick(options?: Omit<ClickOptions, 'button'>): Promise<void>
   setMotionStyle(style: MotionStyle): void
+  retarget(): void
+}
+
+function resolveTeleportHost(
+  teleportTo: PointingCursorTeleportTo | undefined,
+): Element | null {
+  if (teleportTo === false) return null
+  if (typeof document === 'undefined') return null
+  const target = teleportTo ?? 'body'
+  if (typeof target !== 'string') return target
+  if (target === 'body') return document.body
+  return document.querySelector(target)
 }
 
 export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorProps>(
@@ -109,6 +139,9 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
       clickBurstRightColor = '#ef4444',
       clickBurstColor = '#111111',
       emitMoveFrames = false,
+      retargetOnResize = true,
+      coordinateRoot = null,
+      teleportTo = 'body',
       className,
       style,
       onMove,
@@ -126,6 +159,10 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
     const [button, setButton] = useState<MouseButton | null>(null)
     const [shapeMarkup, setShapeMarkup] = useState('')
     const [shapePaint, setShapePaint] = useState<Record<string, string>>({})
+    /** Resolved portal host; null while SSR or when `teleportTo={false}`. */
+    const [host, setHost] = useState<Element | null>(() =>
+      typeof document !== 'undefined' ? resolveTeleportHost(teleportTo) : null,
+    )
 
     const onMoveRef = useRef(onMove)
     const onShowRef = useRef(onShow)
@@ -135,6 +172,13 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
     onHideRef.current = onHide
 
     useEffect(() => {
+      setHost(resolveTeleportHost(teleportTo))
+    }, [teleportTo])
+
+    useEffect(() => {
+      // Wait for a portal host when teleporting; in-place mode mounts immediately.
+      if (teleportTo !== false && !host) return
+
       const controller = createCursorController(
         {
           getRootEl: () => rootRef.current,
@@ -175,6 +219,8 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
           clickBurstRightColor,
           clickBurstColor,
           emitMoveFrames,
+          retargetOnResize,
+          coordinateRoot,
         },
       )
       controllerRef.current = controller
@@ -185,8 +231,9 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
         controller.destroy()
         controllerRef.current = null
       }
-      // Mount once; options synced below.
-    }, [])
+      // Remount when portal host appears; options synced below.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional host-gated mount
+    }, [host, teleportTo])
 
     useEffect(() => {
       const c = controllerRef.current
@@ -218,6 +265,8 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
         clickBurstRightColor,
         clickBurstColor,
         emitMoveFrames,
+        retargetOnResize,
+        coordinateRoot,
       })
       setShapeMarkup(c.getShapeMarkup())
       setShapePaint(c.getShapePaintStyle())
@@ -248,6 +297,8 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
       clickBurstRightColor,
       clickBurstColor,
       emitMoveFrames,
+      retargetOnResize,
+      coordinateRoot,
     ])
 
     useImperativeHandle(ref, () => ({
@@ -262,6 +313,7 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
       leftClick: (o) => controllerRef.current!.leftClick(o),
       rightClick: (o) => controllerRef.current!.rightClick(o),
       setMotionStyle: (s) => controllerRef.current?.setMotionStyle(s),
+      retarget: () => controllerRef.current?.retarget(),
     }))
 
     const outerStyle = useMemo(
@@ -287,7 +339,7 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
       .filter(Boolean)
       .join(' ')
 
-    return (
+    const node = (
       <div
         ref={rootRef}
         className={classNames}
@@ -315,6 +367,9 @@ export const PointingCursor = forwardRef<PointingCursorHandle, PointingCursorPro
         </div>
       </div>
     )
+
+    if (teleportTo === false || !host) return node
+    return createPortal(node, host)
   },
 )
 

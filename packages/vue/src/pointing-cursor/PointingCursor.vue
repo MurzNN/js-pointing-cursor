@@ -47,6 +47,21 @@ const props = withDefaults(
     clickBurstRightColor?: string
     clickBurstColor?: string
     emitMoveFrames?: boolean
+    /**
+     * Re-aim at the last selector/Element/local target on window resize (default true).
+     */
+    retargetOnResize?: boolean
+    /**
+     * When set, numeric `moveTo(x, y)` uses this element's local CSS pixel space
+     * (e.g. Slidev `#slide-content`). Selectors still resolve in viewport space.
+     */
+    coordinateRoot?: string | Element | null
+    /**
+     * Mount the fixed overlay under this target so viewport coordinates stay
+     * valid under CSS-transformed ancestors (e.g. Slidev `scale()`).
+     * Default: `'body'`. Pass `false` to keep the node in-place.
+     */
+    teleportTo?: string | HTMLElement | false
   }>(),
   {
     size: '3em',
@@ -73,6 +88,9 @@ const props = withDefaults(
     clickBurstRightColor: '#ef4444',
     clickBurstColor: '#111111',
     emitMoveFrames: false,
+    retargetOnResize: true,
+    coordinateRoot: null,
+    teleportTo: 'body',
   },
 )
 
@@ -89,6 +107,12 @@ const pressed = ref(false)
 const button = ref<MouseButton | null>(null)
 const shapeMarkup = ref('')
 const shapePaintStyle = ref<Record<string, string>>({})
+
+const teleportDisabled = computed(() => props.teleportTo === false)
+/** Vue Teleport requires a target even when disabled; value is ignored then. */
+const teleportTarget = computed(() =>
+  props.teleportTo === false ? 'body' : props.teleportTo,
+)
 
 function configFromProps() {
   return {
@@ -118,6 +142,8 @@ function configFromProps() {
     clickBurstRightColor: props.clickBurstRightColor,
     clickBurstColor: props.clickBurstColor,
     emitMoveFrames: props.emitMoveFrames,
+    retargetOnResize: props.retargetOnResize,
+    coordinateRoot: props.coordinateRoot,
   }
 }
 
@@ -194,38 +220,41 @@ defineExpose({
   rightClick: (options?: Omit<ClickOptions, 'button'>) =>
     controller.rightClick(options),
   setMotionStyle: (style: MotionStyle) => controller.setMotionStyle(style),
+  retarget: () => controller.retarget(),
 })
 </script>
 
 <template>
-  <div
-    ref="rootEl"
-    class="pointing-cursor"
-    v-bind="$attrs"
-    :class="[
-      `pointing-cursor--${shape}`,
-      { 'pointing-cursor--hidden': !isVisible },
-    ]"
-    :style="outerStyle"
-    aria-hidden="true"
-  >
-    <div ref="innerEl" class="pointing-cursor__inner">
-      <slot
-        :pressed="pressed"
-        :button="button"
-        :stroke="stroke"
-        :fill="fill"
-      >
-        <div
-          class="pointing-cursor__shape"
-          :data-pressed="pressed ? 'true' : 'false'"
-          :data-button="button ?? undefined"
-          :style="shapePaintStyle"
-          v-html="shapeMarkup"
-        />
-      </slot>
+  <Teleport :to="teleportTarget" :disabled="teleportDisabled">
+    <div
+      ref="rootEl"
+      class="pointing-cursor"
+      v-bind="$attrs"
+      :class="[
+        `pointing-cursor--${shape}`,
+        { 'pointing-cursor--hidden': !isVisible },
+      ]"
+      :style="outerStyle"
+      aria-hidden="true"
+    >
+      <div ref="innerEl" class="pointing-cursor__inner">
+        <slot
+          :pressed="pressed"
+          :button="button"
+          :stroke="stroke"
+          :fill="fill"
+        >
+          <div
+            class="pointing-cursor__shape"
+            :data-pressed="pressed ? 'true' : 'false'"
+            :data-button="button ?? undefined"
+            :style="shapePaintStyle"
+            v-html="shapeMarkup"
+          />
+        </slot>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
