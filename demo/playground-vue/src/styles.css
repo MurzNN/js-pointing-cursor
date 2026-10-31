@@ -180,6 +180,22 @@ button.active {
   overflow: hidden;
 }
 
+.zoom-stage {
+  position: relative;
+  min-height: 180px;
+  overflow: hidden;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.zoomed-content {
+  position: absolute;
+  top: 36px;
+  right: 48px;
+  zoom: 0.7;
+}
+
 .marker {
   position: absolute;
   width: 14px;

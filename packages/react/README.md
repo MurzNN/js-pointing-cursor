@@ -5,6 +5,7 @@ React oversized pointing cursor with curved motion, follow mode, and click burst
 Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-pointing-cursor) · Demo: [https://murznn.github.io/js-pointing-cursor/react/](https://murznn.github.io/js-pointing-cursor/react/)
 
 - Curved, human-like `moveTo` (coords or CSS selector)
+- CSS-zoom-aware targeting for DOM elements
 - Follow mode, dangling aim, click press + radiating burst
 - Bundled arrow / pointer / hand SVG shapes
 

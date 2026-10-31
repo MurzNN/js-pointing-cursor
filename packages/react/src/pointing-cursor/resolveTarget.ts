@@ -7,6 +7,17 @@ export class TargetResolutionError extends Error {
   }
 }
 
+function effectiveZoom(el: Element): number {
+  let zoom = 1
+  let current: Element | null = el
+  while (current) {
+    const value = Number.parseFloat(getComputedStyle(current).zoom)
+    if (Number.isFinite(value) && value > 0) zoom *= value
+    current = current.parentElement
+  }
+  return zoom
+}
+
 /**
  * Resolve a CSS selector or Element to the center of its bounding box
  * in viewport coordinates.
@@ -25,9 +36,10 @@ export function resolveElementCenter(target: string | Element): Point {
   }
 
   const rect = el.getBoundingClientRect()
+  const zoom = effectiveZoom(el)
   return {
-    x: rect.left + rect.width / 2,
-    y: rect.top + rect.height / 2,
+    x: (rect.left + rect.width / 2) * zoom,
+    y: (rect.top + rect.height / 2) * zoom,
   }
 }
 

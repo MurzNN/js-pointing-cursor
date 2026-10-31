@@ -79,6 +79,31 @@ describe('resolveElementCenter', () => {
     expect(resolveElementCenter(el)).toEqual({ x: 120, y: 60 })
   })
 
+  it('accounts for CSS zoom on the target and its ancestors', () => {
+    const zoomed = document.createElement('div')
+    zoomed.style.zoom = '0.5'
+    const target = document.createElement('button')
+    target.id = 'zoomed-target'
+    zoomed.appendChild(target)
+    document.body.appendChild(zoomed)
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 100,
+      top: 50,
+      width: 40,
+      height: 20,
+      right: 140,
+      bottom: 70,
+      x: 100,
+      y: 50,
+      toJSON: () => ({}),
+    })
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(((element: Element) => ({
+      zoom: element === zoomed ? '0.5' : '1',
+    })) as typeof getComputedStyle)
+
+    expect(resolveElementCenter('#zoomed-target')).toEqual({ x: 60, y: 30 })
+  })
+
   it('warns and throws when selector matches nothing', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     expect(() => resolveElementCenter('#missing')).toThrow(TargetResolutionError)

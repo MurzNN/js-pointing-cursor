@@ -166,6 +166,13 @@ export default function App() {
           ))}
           <button
             type="button"
+            data-testid="btn-move-zoomed"
+            onClick={() => void cursorRef.current?.moveTo('#zoomed-target')}
+          >
+            Move to zoomed target
+          </button>
+          <button
+            type="button"
             data-testid="btn-move-selector"
             onClick={() =>
               void cursorRef.current?.moveTo('[data-testid="demo-button"]')
@@ -212,6 +219,25 @@ export default function App() {
           Target
         </button>
       </div>
+
+      <section className="panel">
+        <h2>Target inside CSS zoom</h2>
+        <p className="hint">
+          The target is inside a 70%-zoomed container. Move the cursor to verify
+          that it lands at the target center.
+        </p>
+        <div className="zoom-stage">
+          <div className="zoomed-content">
+            <button
+              id="zoomed-target"
+              type="button"
+              data-testid="zoomed-target"
+            >
+              Zoomed target
+            </button>
+          </div>
+        </div>
+      </section>
 
       <section className="panel">
         <h2>Install</h2>

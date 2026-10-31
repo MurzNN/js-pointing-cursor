@@ -99,6 +99,22 @@ button:hover {
   background: rgba(255, 255, 255, 0.6);
 }
 
+.zoom-stage {
+  position: relative;
+  min-height: 180px;
+  overflow: hidden;
+  border: 1px dashed #bbb;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.zoomed-content {
+  position: absolute;
+  top: 36px;
+  right: 48px;
+  zoom: 0.7;
+}
+
 .marker {
   position: absolute;
   width: 28px;

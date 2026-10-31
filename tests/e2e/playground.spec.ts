@@ -1,4 +1,33 @@
-import { expect, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
+
+async function expectCursorAtZoomedTarget(page: Page) {
+  const cursor = page.locator('[data-testid$="-cursor"]')
+  const target = page.getByTestId('zoomed-target')
+  await expect(page.locator('.zoomed-content')).toHaveCSS('zoom', '0.7')
+  await expect(target).toBeVisible()
+  await page.getByTestId('btn-move-zoomed').click()
+  await page.waitForTimeout(1100)
+
+  const expected = await target.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    let zoom = 1
+    let current: Element | null = element
+    while (current) {
+      const value = Number.parseFloat(getComputedStyle(current).zoom)
+      if (Number.isFinite(value) && value > 0) zoom *= value
+      current = current.parentElement
+    }
+    return {
+      x: (rect.left + rect.width / 2) * zoom,
+      y: (rect.top + rect.height / 2) * zoom,
+    }
+  })
+  const actual = await cursor.boundingBox()
+  expect(actual).toBeTruthy()
+  const hotspotX = actual!.x + actual!.width * 0.33
+  const hotspotY = actual!.y + actual!.height * 0.17
+  expect(Math.hypot(hotspotX - expected.x, hotspotY - expected.y)).toBeLessThan(35)
+}
 
 test.describe('vue-cursor playground', () => {
   test.beforeEach(async ({ page }) => {
@@ -52,6 +81,10 @@ test.describe('vue-cursor playground', () => {
     expect(Math.hypot(cx - bx, cy - by)).toBeLessThan(45)
   })
 
+  test('moves to a target inside CSS zoom', async ({ page }) => {
+    await expectCursorAtZoomedTarget(page)
+  })
+
   test('can switch shapes', async ({ page }) => {
     await page.getByTestId('shape-select').getByLabel('hand', { exact: true }).check()
     await expect(page.locator('.pointing-cursor-shape--hand')).toBeVisible()
@@ -66,5 +99,13 @@ test.describe('vue-cursor playground', () => {
     await page.waitForTimeout(100)
     await page.getByTestId('btn-follow').click()
     await expect(page.getByTestId('btn-follow')).toContainText('Follow mouse')
+  })
+})
+
+test.describe('react-cursor playground', () => {
+  test('moves to a target inside CSS zoom', async ({ page }) => {
+    await page.goto('http://127.0.0.1:4174/')
+    await expect(page.getByTestId('react-cursor')).toBeVisible()
+    await expectCursorAtZoomedTarget(page)
   })
 })

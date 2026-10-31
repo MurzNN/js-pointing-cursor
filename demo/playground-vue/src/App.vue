@@ -71,6 +71,13 @@ async function goToDemoButton() {
   await cursorRef.value.moveTo('#demo-button')
 }
 
+async function goToZoomedTarget() {
+  if (!cursorRef.value) return
+  visible.value = true
+  followMouse.value = false
+  await cursorRef.value.moveTo('#zoomed-target')
+}
+
 function toggleFollow() {
   followMouse.value = !followMouse.value
   cursorRef.value?.setFollow(followMouse.value)
@@ -245,6 +252,13 @@ async function rightClickDemo() {
           >
             Move to #demo-button
           </button>
+          <button
+            type="button"
+            data-testid="btn-move-zoomed"
+            @click="goToZoomedTarget"
+          >
+            Move to zoomed target
+          </button>
         </div>
 
         <div class="row">
@@ -304,6 +318,25 @@ async function rightClickDemo() {
         Markers A–C use viewport coordinates. The center button uses
         <code>moveTo('#demo-button')</code>.
       </p>
+    </section>
+
+    <section class="panel">
+      <h2>Target inside CSS zoom</h2>
+      <p class="hint">
+        The target is inside a 70%-zoomed container. Move the cursor to verify
+        that it lands at the target center.
+      </p>
+      <div class="zoom-stage">
+        <div class="zoomed-content">
+          <button
+            id="zoomed-target"
+            type="button"
+            data-testid="zoomed-target"
+          >
+            Zoomed target
+          </button>
+        </div>
+      </div>
     </section>
 
     <section class="panel install">

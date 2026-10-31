@@ -14,11 +14,20 @@ export default defineConfig({
     ...(process.env.CI ? {} : { channel: 'chrome' as const }),
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
-    command:
-      'pnpm --filter @js-pointing-cursor/playground-vue exec vite --host 127.0.0.1 --port 4173 --strictPort',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
+  webServer: [
+    {
+      command:
+        'pnpm --filter @js-pointing-cursor/playground-vue exec vite --host 127.0.0.1 --port 4173 --strictPort',
+      url: 'http://127.0.0.1:4173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      command:
+        'pnpm --filter @js-pointing-cursor/playground-react exec vite --host 127.0.0.1 --port 4174 --strictPort',
+      url: 'http://127.0.0.1:4174',
+      reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+  ],
 })

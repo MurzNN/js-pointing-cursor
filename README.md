@@ -6,6 +6,7 @@ Repository: [github.com/MurzNN/js-pointing-cursor](https://github.com/MurzNN/js-
 
 <!-- pkg:all -->
 - Curved, human-like `moveTo` (coords or CSS selector)
+- CSS-zoom-aware targeting for DOM elements
 - Follow mode, dangling aim, click press + radiating burst
 - Bundled arrow / pointer / hand SVG shapes
 
