@@ -1,6 +1,6 @@
 {
   "name": "react-pointing-cursor",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "React oversized pointing cursor with curved motion, follow mode, and click burst.",
   "type": "module",
   "sideEffects": [
