@@ -4,6 +4,14 @@ Notable changes to `vue-pointing-cursor` / `react-pointing-cursor` (and shared c
 Each release prepends a section from commits since the previous tag;
 GitHub Releases use the same notes.
 
+## [0.3.3] - 2026-11-23
+
+### Changes
+
+- fix: stop scaling element targets by CSS zoom (04e7c03)
+
+**Full changelog**: https://github.com/MurzNN/js-pointing-cursor/compare/v0.3.2...v0.3.3
+
 ## [0.3.2] - 2026-10-31
 
 ### Changes
