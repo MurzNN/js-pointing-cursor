@@ -10,16 +10,9 @@ async function expectCursorAtZoomedTarget(page: Page) {
 
   const expected = await target.evaluate((element) => {
     const rect = element.getBoundingClientRect()
-    let zoom = 1
-    let current: Element | null = element
-    while (current) {
-      const value = Number.parseFloat(getComputedStyle(current).zoom)
-      if (Number.isFinite(value) && value > 0) zoom *= value
-      current = current.parentElement
-    }
     return {
-      x: (rect.left + rect.width / 2) * zoom,
-      y: (rect.top + rect.height / 2) * zoom,
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
     }
   })
   const actual = await cursor.boundingBox()

@@ -79,13 +79,14 @@ describe('resolveElementCenter', () => {
     expect(resolveElementCenter(el)).toEqual({ x: 120, y: 60 })
   })
 
-  it('accounts for CSS zoom on the target and its ancestors', () => {
+  it('uses the visual center under CSS zoom without scaling the rect again', () => {
     const zoomed = document.createElement('div')
     zoomed.style.zoom = '0.5'
     const target = document.createElement('button')
     target.id = 'zoomed-target'
     zoomed.appendChild(target)
     document.body.appendChild(zoomed)
+    // Normal browsers already apply CSS zoom to getBoundingClientRect.
     vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
       left: 100,
       top: 50,
@@ -101,7 +102,7 @@ describe('resolveElementCenter', () => {
       zoom: element === zoomed ? '0.5' : '1',
     })) as typeof getComputedStyle)
 
-    expect(resolveElementCenter('#zoomed-target')).toEqual({ x: 60, y: 30 })
+    expect(resolveElementCenter('#zoomed-target')).toEqual({ x: 120, y: 60 })
   })
 
   it('warns and throws when selector matches nothing', () => {
